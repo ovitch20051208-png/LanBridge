@@ -138,8 +138,7 @@ First complete a transfer with **Choose files…**. Then, on each computer:
    click **Send files**; the other computer still clicks **Accept**.
 
 No administrator rights are required. Moving the app requires reinstalling the
-action. Use **Remove action** to remove it. Real Finder/Explorer two-machine
-acceptance is still a release gate; see the [illustrated guide](docs/USER_GUIDE.md#file-manager).
+action. Use **Remove action** to remove it. Real M3 Finder forwarding and small-file transfers to Windows passed in [M7](docs/M7_ACCEPTANCE.md); the full Explorer/Finder edge-case checklist remains a release gate.
 
 ## If something is unclear or fails
 
@@ -158,8 +157,7 @@ The [English illustrated guide](docs/USER_GUIDE.md) and
 
 Windows and Apple Silicon tests, native builds and frozen executable checks passed
 in the [recorded CI run](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40571919800).
-Physical Mac M3 ↔ Windows 11 transfers, real file-manager interaction, clean-machine
-installation and signing/notarization remain [manual release gates](docs/MANUAL_ACCEPTANCE.md).
+[M7 physical testing](docs/M7_ACCEPTANCE.md) verified the M3 native app, Finder single-instance forwarding, explicit Decline and a three-file Mac → Windows → Mac round trip with matching SHA-256. The full edge-case checklist, Explorer action, clean-machine installation, actual login startup and signing/notarization remain [manual release gates](docs/MANUAL_ACCEPTANCE.md).
 
 V1 does not include folders, interrupted-transfer resume, auto-accept, mobile/web
 clients, Bluetooth, cloud relay or Apple's AirDrop protocol. **Transfer history

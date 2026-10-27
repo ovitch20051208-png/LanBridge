@@ -291,3 +291,26 @@ and matching English/Chinese documentation. Isolated regression tests verify the
 new-user default, folder creation, custom-path persistence and preservation of
 an existing Downloads setting. Full gate: **66 passed, 1 skipped**; native Cocoa
 desktop tests: **14 passed**. This is not a clean-system installation result.
+
+M7 physical small-file phase: real Finder → Windows transfer of 37 B completed
+on both sides (Windows reported by tester). Actual Finder multi-selection then
+sent three files (78 B total: text, empty and Chinese/space-named) to the tester's
+chosen Windows Desktop folder; sender received validation receipts. An explicit
+Windows Decline produced **declined, 0/78 B**. A repeated accepted batch also
+completed; collision-suffixed names still need direct confirmation.
+
+The tester sent the original three files back from Windows. With the Mac main
+window hidden, the operator observed the standalone Incoming files dialog and
+clicked Accept. Both sides reported complete (`3eaf4370…`, Windows via tester).
+All received SHA-256 values matched the original Mac sources; no Mac staging
+directories remained. Real Finder normal-profile IPC retained the same primary
+PID and left no unrelated second app process. Mac trust/fingerprint survived
+app replacement/restart. Full evidence and screenshots are in
+[M7_ACCEPTANCE.md](M7_ACCEPTANCE.md), with explicit unverified items.
+
+In native Settings, Browse → Desktop → New Folder → Create → Open → Save created
+and selected Desktop/LanBridge Received. Login registration was enabled, its
+valid LaunchAgent path/arguments checked, then disabled and removal verified;
+actual logout/login remains untested. The clean `cac55f8` DMG passed checksum,
+read-only mount, strict app signature and actual mounted frozen Qt/TLS/hash
+diagnostic. No clean-system, Developer ID or notarization result is claimed.

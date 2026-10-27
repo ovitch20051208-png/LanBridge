@@ -26,7 +26,7 @@
 **截图说明：** 图片来自实际运行的 Windows 应用，使用本机两个隔离演示实例。
 配对和文件传输使用真实网络连接，三个接收文件都与源文件的 SHA-256 一致。
 为便于截图，演示传输经过限速，图中速度不是性能测试结果。设备名、验证码、指纹、
-地址和路径仅为示例，不能照抄。这里没有 macOS 界面截图，也不代表已经完成 Mac ↔ Windows 双机实测。
+地址和路径仅为示例，不能照抄。下方 Mac 部分新增了真实 M3 截图，来自 [M7 实机验证](M7_ACCEPTANCE.md)；该记录分别列明已通过的项目与剩余验收项。
 
 <a id="preparation"></a>
 
@@ -156,6 +156,10 @@
 **Settings… → Save received files to → Browse… → 选择可写目录 → Save**。
 在系统目录选择框可新建文件夹；也可直接在设置中输入新文件夹的完整路径，再点 **Save** 创建。两台电脑分别设置自己的接收目录；发送时选文件不会改变接收目录。
 
+Mac 可按 **Browse… → Desktop → New Folder → Create → Open** 操作，回到 LanBridge 后点 **Save**。这套流程已在真实 M3 上验证。
+
+![真实 Mac：接收目录设置](images/mac-m7/05-settings.jpg)
+
 通过托盘 / 菜单栏的 **Received Files** 可以直接打开接收目录；它只打开目录，不执行收到的文件。
 已有 `report.pdf` 时，新文件会保存成 `report (1).pdf`、`report (2).pdf`；
 一次请求里不同目录的同名文件也这样处理，不会静默覆盖。
@@ -216,7 +220,11 @@ Quick Action 放在当前用户的 `~/Library/Services`。入口隐藏时检查�
 
 移动应用或删除源码开发环境后，重新安装入口。**Remove action** 只移除入口，保留文件与设备身份。
 开发者也可用 `--install-integration / --uninstall-integration`，见[安装说明](INSTALLATION.md)。
-真实 Finder / Explorer 双机操作仍待验收；图片展示的是实际集成按钮，不会用虚构的系统菜单截图冒充测试结果。
+本轮 M3 / macOS 15.7 实测中，**Send with LanBridge** 直接出现在 Finder 右键菜单里；不同系统设置可能放在子菜单中。真实 Finder 选文件、转交正常用户配置的已有实例，以及向 Windows 传小文件已在 [M7](M7_ACCEPTANCE.md) 验证；完整边界情况和 Explorer 入口仍需按清单验收。
+
+![真实 Mac：Finder 多选文件转入已有应用实例](images/mac-m7/06-multiple-files-ready.jpg)
+
+![真实 Mac：主窗口隐藏时的收件确认](images/mac-m7/09-background-incoming.jpg)
 
 <a id="background"></a>
 

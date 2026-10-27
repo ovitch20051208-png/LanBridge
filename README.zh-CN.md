@@ -132,7 +132,7 @@ Artifacts 保留 14 天；过期后，仓库所有者可以通过 **Run workflow
    对方仍需点击 **Accept**。
 
 不需要管理员权限。移动程序后需要重新安装入口；移除时在设置中点击 **Remove action**。
-真实 Finder/Explorer 双机流程仍待实机验收，详细步骤见[图文指南](docs/USER_GUIDE.zh-CN.md#file-manager)。
+M3 上真实 Finder 入口、正常用户配置的单实例转交及向 Windows 发小文件已在 [M7](docs/M7_ACCEPTANCE.md) 验证；完整 Explorer / Finder 边界情况仍按[清单](docs/MANUAL_ACCEPTANCE.md)验收。
 
 ## 如果不知道该怎么继续
 
@@ -149,7 +149,7 @@ Artifacts 保留 14 天；过期后，仓库所有者可以通过 **Run workflow
 
 [已记录的 CI](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40571919800)
 通过了 Windows / Apple Silicon 测试、原生构建和打包程序自检。
-Mac M3 ↔ Windows 11 双机实传、真实文件管理器操作、干净系统安装、发行签名/公证仍属于
+[M7 实机测试](docs/M7_ACCEPTANCE.md)已验证 M3 原生应用、Finder 单实例入口、明确拒绝，以及三个文件的 Mac → Windows → Mac 往返，SHA-256 全部一致。完整边界清单、Explorer 入口、干净系统安装、实际登录启动和发行签名 / 公证仍属于
 [实机验收项目](docs/MANUAL_ACCEPTANCE.md)。
 
 V1 不包含文件夹传输、断点续传、自动接受、手机/网页客户端、蓝牙、云中转或 Apple AirDrop 协议兼容。

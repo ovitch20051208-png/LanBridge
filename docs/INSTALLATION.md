@@ -45,9 +45,7 @@ Launch at login is off by default; enable/disable it in Settings. Windows uses
 the current-user Run registry key; macOS writes a per-user LaunchAgent effective
 at the next login. No administrator rights or firewall changes are requested.
 
-Native Finder execution and real Mac/Windows file-manager acceptance remain
-manual release gates. The Windows test creates a real shortcut in a temporary
-directory; it does not install an action in the developer's personal Send To folder.
+Physical M3 Finder invocation, existing-instance forwarding and small transfers to Windows were exercised in [M7](M7_ACCEPTANCE.md). Full Explorer/Finder edge cases and clean-system installation remain release gates. The Windows automated shortcut test uses a temporary directory rather than the personal Send To folder.
 
 ## Windows portable distribution
 

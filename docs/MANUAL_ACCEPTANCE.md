@@ -1,4 +1,6 @@
-# Physical Mac ↔ Windows acceptance (not yet executed)
+# Physical Mac ↔ Windows acceptance
+
+M7 is in progress on a real M3 and Windows computer. See the [observed evidence](M7_ACCEPTANCE.md) for completed checks; the entire checklist below is not yet signed off.
 
 Record build SHA, OS versions, CPU architecture, LAN topology, tester and date.
 Use a Windows 11 x86-64 machine and a real Apple Silicon Mac. No browser is used.

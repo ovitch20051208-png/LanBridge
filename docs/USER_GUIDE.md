@@ -30,7 +30,7 @@ The pairing and accepted transfer used real sockets and certificates. All three
 received demo files matched their source SHA-256 digests. Transfer pacing was
 slowed for a readable screenshot; pictured speed is not a benchmark. The example
 device names, verification code, fingerprints, addresses and folders are not values
-you should copy. No macOS UI screenshot or physical Mac-to-Windows acceptance is implied.
+you should copy. Additional Mac images below are real M3 captures from [M7 physical testing](M7_ACCEPTANCE.md); see that record for the completed checks and remaining release gates.
 
 <a id="preparation"></a>
 
@@ -206,6 +206,10 @@ sent/received database and is not restored as a full history after restarting.
 
 New installations receive into **Desktop/LanBridge Received**. Existing saved destinations, including Downloads, stay in use. Change the folder with **Settings… → Save received files to → Browse… → Save**. In the folder picker you can create a folder, or enter a new absolute path in the settings field and click **Save** to create it. Both computers set their own receive folder; choosing a send file does not change it.
 
+On Mac, **Browse… → Desktop → New Folder → Create → Open**, then **Save** in LanBridge. This exact flow was exercised on the real M3.
+
+![Real Mac receive-folder settings](images/mac-m7/05-settings.jpg)
+
 To open it, use the tray/menu-bar menu's **Received Files**. This opens the
 directory in the system file manager; it does not execute a received file.
 
@@ -282,8 +286,11 @@ Use **Remove action** to uninstall the action without deleting files or identity
 The source CLI also supports `--install-integration` and `--uninstall-integration`;
 see [installation](INSTALLATION.md) if you are developing from source.
 
-Native two-machine Finder/Explorer acceptance remains unverified. The screenshots
-here show the real integration controls, not a fabricated Mac or shell-menu image.
+On the tested M3/macOS 15.7, **Send with LanBridge** appeared directly in the Finder context menu. Its position can vary by OS settings. Real Finder selection, normal-profile single-instance forwarding and small-file transfers to Windows passed in [M7](M7_ACCEPTANCE.md); the complete edge-case and Explorer-action checklist remains a release gate.
+
+![Real Mac app after Finder forwarded three selected files](images/mac-m7/06-multiple-files-ready.jpg)
+
+![Real Mac incoming prompt while the main window was hidden](images/mac-m7/09-background-incoming.jpg)
 
 <a id="background"></a>
 
