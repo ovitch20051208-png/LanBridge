@@ -341,3 +341,20 @@ completed successfully in all six jobs. Python 3.12 logs were inspected: Windows
 **67 passed**, Mac **66 passed, 1 skipped**, docs/lint/format passed; both native
 builds and frozen executable diagnostics passed. Later interaction improvements
 requested by the tester are a separate implementation phase.
+
+M7 interaction refinement requested during physical testing: authenticated IPC
+now preserves an explicit `--send` intent separately from ordinary file
+selection. A sole paired online recipient receives the request directly; with
+multiple recipients, one click in a compact picker sends it. Startup briefly
+collects discovery, queued actions retain separate path lists, and no paired
+online target means no automatic send. Existing certificate pins, pairing and
+per-request receiver consent remain unchanged. Settings now persistently shows
+action installation state and offers Reinstall, which updates the same fixed
+shortcut/workflow rather than downloading another app.
+
+Implementation validation: full gate **74 passed, 1 skipped**; native Cocoa
+desktop/IPC/integration checks **25 passed, 1 skipped**. Tests include actual
+cross-process IPC intent forwarding, real paired TLS delivery with a hidden
+sender and explicit receiver consent, multiple-target one-click selection,
+unpaired/offline/revoked targets, empty selections and repeated native action
+installation. Rebuilt-bundle and physical direct-send checks follow separately.

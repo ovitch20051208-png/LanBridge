@@ -25,6 +25,8 @@ python -m lanbridge --install-integration
 python -m lanbridge --uninstall-integration
 ```
 
+Settings displays Installed / Not installed and the fixed action path. Reinstall updates the same action; it does not download or duplicate the application. A file action with exactly one paired online device starts its request directly; with multiple targets, click one in the compact selector. Cold starts briefly wait for discovery. The receiver always confirms Accept/Decline.
+
 Windows: the installer writes only the current user's **Send To** shortcut.
 Select files in Explorer → right-click → Show more options → Send to →
 Send with LanBridge. It supports OS-supplied multiple paths, spaces and Unicode.

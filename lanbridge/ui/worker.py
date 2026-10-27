@@ -28,6 +28,7 @@ class Events(QObject):
     ready = Signal(int)
     received = Signal(object)
     forwarded = Signal(object)
+    send_requested = Signal(object)
     paired = Signal(object)
 
 

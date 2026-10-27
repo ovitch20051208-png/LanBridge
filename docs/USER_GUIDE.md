@@ -256,26 +256,29 @@ changing IP address, identifies a device.
 
 The **Install file-manager action** and **Remove action** buttons are near the
 bottom of the Settings screenshot above. Install separately on each computer.
-Keep the app in its final location before installing the action.
+Keep the app in its final location before installing the action. Settings shows **Installed / Not installed** and the action path; an installed action has a **Reinstall file-manager action** button. Reinstall updates the same shortcut/workflow, not another copy of the app. Click OK and Save to close Settings before using the file action.
+
+Right-click sending waits briefly for discovery on a cold start. Only paired online devices are eligible; if none are available, cancel the selector and open/pair the other computer. Ordinary **Choose files…** still uses the main-window **Send files** button.
 
 ### Windows Explorer
 
 1. Click **Settings… → Install file-manager action**.
 2. Select files in Explorer.
 3. Right-click → **Show more options → Send to → Send with LanBridge**.
-4. LanBridge shows those files and its recipient list. Select the paired target
-   and click **Send files**. The receiver clicks **Accept**.
+4. Exactly one paired online target: the request starts directly. Multiple paired online targets: click one in the compact selector to send immediately. The receiver clicks **Accept**; there is no extra **Send files** step.
 
 This uses the current user's Send To directory. Multiple selected file paths,
 spaces and Unicode are supported when passed by the OS. For a very large total
 command-line length, use **Choose files…** instead.
+
+File Explorer is the normal Windows folder window; you can also right-click a file directly on the Desktop. Install the action once first. If Send to only lists built-in items such as Bluetooth and Documents, install the LanBridge action from Settings. The **Installed** path identifies the Send To shortcut, not the receive folder; **Save received files to** controls received files.
 
 ### macOS Finder
 
 1. From the app in Applications, click **Settings… → Install file-manager action**.
 2. Select files in Finder.
 3. Right-click → **Quick Actions / Services → Send with LanBridge**.
-4. Choose the paired recipient and click **Send files**; the receiver clicks **Accept**.
+4. A sole paired online target receives the request directly; with multiple targets, click the intended device in the compact selector. The receiver still clicks **Accept**.
 
 The generated Quick Action is installed in `~/Library/Services` for the current
 user. If hidden, check the OS's Services / keyboard-shortcut settings; the exact
@@ -287,8 +290,6 @@ The source CLI also supports `--install-integration` and `--uninstall-integratio
 see [installation](INSTALLATION.md) if you are developing from source.
 
 On the tested M3/macOS 15.7, **Send with LanBridge** appeared directly in the Finder context menu. Its position can vary by OS settings. Real Finder selection, normal-profile single-instance forwarding and small-file transfers to Windows passed in [M7](M7_ACCEPTANCE.md); the complete edge-case and Explorer-action checklist remains a release gate.
-
-![Real Mac app after Finder forwarded three selected files](images/mac-m7/06-multiple-files-ready.jpg)
 
 ![Real Mac incoming prompt while the main window was hidden](images/mac-m7/09-background-incoming.jpg)
 

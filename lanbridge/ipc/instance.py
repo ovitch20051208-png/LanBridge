@@ -25,6 +25,8 @@ def validate_request(message: dict, token: str) -> list[Path]:
         raise ValueError("Invalid IPC request")
     if not secrets.compare_digest(message["token"], token) or message.get("v") != 1:
         raise ValueError("IPC authentication failed")
+    if not isinstance(message.get("send", False), bool):
+        raise ValueError("Invalid IPC send intent")
     paths = message.get("files")
     if not isinstance(paths, list) or len(paths) > MAX_FILES:
         raise ValueError("Too many selected files")
@@ -34,8 +36,14 @@ def validate_request(message: dict, token: str) -> list[Path]:
 
 
 class SingleInstance:
-    def __init__(self, directory: Path, selected: Callable[[list[Path]], None]):
+    def __init__(
+        self,
+        directory: Path,
+        selected: Callable[[list[Path]], None],
+        send_selected: Callable[[list[Path]], None] | None = None,
+    ):
         self.directory, self.selected = directory, selected
+        self.send_selected = send_selected or selected
         self.name = (
             "lanbridge-" + hashlib.sha256(str(directory.resolve()).casefold().encode()).hexdigest()[:32]
         )
@@ -60,7 +68,7 @@ class SingleInstance:
         write_json(self.directory / "ipc.json", {"v": 1, "token": self.token})
         return True
 
-    def forward(self, paths: list[Path], timeout: float = 6) -> bool:
+    def forward(self, paths: list[Path], timeout: float = 6, *, send: bool = False) -> bool:
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             try:
@@ -71,7 +79,12 @@ class SingleInstance:
                     if socket.waitForConnected(150):
                         log.debug("IPC connected")
                         data = json.dumps(
-                            {"v": 1, "token": token, "files": [str(p.absolute()) for p in paths]},
+                            {
+                                "v": 1,
+                                "token": token,
+                                "files": [str(p.absolute()) for p in paths],
+                                "send": send,
+                            },
                             ensure_ascii=False,
                         ).encode("utf-8")
                         if len(data) > MAX_FRAME:
@@ -129,8 +142,9 @@ class SingleInstance:
         if len(buffer) < size + 4:
             return
         try:
-            paths = validate_request(json.loads(buffer[4:].decode("utf-8")), self.token)
-            self.selected(paths)
+            message = json.loads(buffer[4:].decode("utf-8"))
+            paths = validate_request(message, self.token)
+            (self.send_selected if message.get("send", False) else self.selected)(paths)
             socket.write(b"OK")
             socket.flush()
             socket.disconnectFromServer()

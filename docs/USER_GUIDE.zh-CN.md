@@ -198,13 +198,17 @@ Mac 可按 **Browse… → Desktop → New Folder → Create → Open** 操作�
 ## 9. 从资源管理器 / Finder 发送
 
 上图底部有 **Install file-manager action** 和 **Remove action**。
-先把应用放在固定位置，再在两台电脑上分别安装入口。
+先把应用放在固定位置，再在两台电脑上分别安装入口。设置会持续显示 **Installed / Not installed（已安装 / 未安装）** 和入口路径；已安装时按钮变为 **Reinstall file-manager action（重新安装）**。重新安装只更新同一快捷方式 / workflow，不会再下载一份应用。完成后点 OK，再 Save 关闭设置。
+
+冷启动时会短暂等待设备发现；只有已配对且在线的设备才可接收右键请求。没有可用设备时，可取消选择框，先打开对方应用或完成配对。普通 **Choose files…** 仍使用主窗口里的 **Send files**。
 
 **Windows：**
 
 1. 点击 **Settings… → Install file-manager action**。
 2. 在资源管理器选文件，右键 → **显示更多选项 → 发送到 → Send with LanBridge**。
-3. 在 LanBridge 选择已配对目标，点 **Send files**；接收方点 **Accept**。
+3. 只有一台已配对在线设备时直接发出请求；有多台时，在简洁列表点击目标即发送，无需再点 **Send files**；接收方点 **Accept**。
+
+“资源管理器”就是平常打开文件夹的窗口，也可以直接在桌面文件上右键。首次必须先点 **Install file-manager action**；如果“发送到”只有蓝牙、文档等系统项目，说明 LanBridge 入口还未安装。**Installed 弹窗里的 C 盘路径是快捷方式的位置，不是文件接收目录**；接收目录仍由 Save received files to 决定。
 
 入口位于当前用户的“发送到”目录。支持系统传来的多个路径、空格和 Unicode。
 路径总长特别大、遇到系统命令行长度限制时，改用 **Choose files…**。
@@ -213,7 +217,7 @@ Mac 可按 **Browse… → Desktop → New Folder → Create → Open** 操作�
 
 1. 从“应用程序”中的应用点击 **Settings… → Install file-manager action**。
 2. Finder 选文件，右键 → **快速操作 / 服务 → Send with LanBridge**。
-3. 选择目标并点 **Send files**，对方点 **Accept**。
+3. 只有一台已配对在线设备时直接发出请求；有多台时点击目标即发送。对方仍需点 **Accept**。
 
 Quick Action 放在当前用户的 `~/Library/Services`。入口隐藏时检查系统的服务 / 键盘快捷键设置，
 具体路径可能随 macOS 版本不同。应用已经在后台时，文件会转交给同一实例，不需要手动启动第二个窗口。
@@ -221,8 +225,6 @@ Quick Action 放在当前用户的 `~/Library/Services`。入口隐藏时检查�
 移动应用或删除源码开发环境后，重新安装入口。**Remove action** 只移除入口，保留文件与设备身份。
 开发者也可用 `--install-integration / --uninstall-integration`，见[安装说明](INSTALLATION.md)。
 本轮 M3 / macOS 15.7 实测中，**Send with LanBridge** 直接出现在 Finder 右键菜单里；不同系统设置可能放在子菜单中。真实 Finder 选文件、转交正常用户配置的已有实例，以及向 Windows 传小文件已在 [M7](M7_ACCEPTANCE.md) 验证；完整边界情况和 Explorer 入口仍需按清单验收。
-
-![真实 Mac：Finder 多选文件转入已有应用实例](images/mac-m7/06-multiple-files-ready.jpg)
 
 ![真实 Mac：主窗口隐藏时的收件确认](images/mac-m7/09-background-incoming.jpg)
 

@@ -3,20 +3,13 @@ import concurrent.futures
 import socket
 
 import pytest
-from PySide6.QtWidgets import QApplication, QDialog
+from PySide6.QtWidgets import QDialog
 from zeroconf import ServiceInfo
 
 from lanbridge.core.config import Settings
 from lanbridge.network.discovery import SERVICE, Peer, parse_peer
 from lanbridge.ui.app import DecisionDialog, MainWindow, human_size
 from lanbridge.ui.worker import Events, NetworkWorker
-
-
-@pytest.fixture(scope="session")
-def qapp():
-    app = QApplication.instance() or QApplication([])
-    app.setQuitOnLastWindowClosed(False)
-    return app
 
 
 def test_discovery_metadata():
@@ -264,13 +257,16 @@ async def test_two_desktops_pair_and_receive_while_hidden(qapp, tmp_path, monkey
         assert not right_window.isVisible() and right.thread.is_alive()
         source = tmp_path / "hidden recipient.txt"
         source.write_text("Receiver main window stays hidden")
-        sending = left.send(Peer(right.identity.id, "Receiver", "Desktop", "127.0.0.1", right.port), [source])
+        left_window.set_peers([Peer(right.identity.id, "Receiver", "Desktop", "127.0.0.1", right.port)])
+        left_window.send_from_file_manager([source])
         await until(lambda: right_window.dialogs)
         await until(lambda: right_window.dialogs[0].windowHandle().isExposed())
         assert not right_window.isVisible()
         assert not right_window.windowHandle().isExposed()
+        assert not left_window.isVisible()
+        assert not (right_settings.downloads / source.name).exists()
         right_window.dialogs[0].accept()
-        await until(sending.done)
+        await until(lambda: any(value.state == "complete" for value in left_window.transfers.values()))
         assert (right_settings.downloads / source.name).read_text() == source.read_text()
         assert not right_window.isVisible()
     finally:

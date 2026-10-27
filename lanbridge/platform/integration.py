@@ -53,6 +53,14 @@ def mac_workflow_path() -> Path:
     return Path.home() / "Library/Services/Send with LanBridge.workflow"
 
 
+def action_path() -> Path:
+    if sys.platform == "win32":
+        return windows_send_to_path()
+    if sys.platform == "darwin":
+        return mac_workflow_path()
+    raise OSError("Native file-manager integration supports Windows and macOS")
+
+
 def workflow_document(command: list[str]) -> dict:
     return {
         "AMDocumentVersion": "2",

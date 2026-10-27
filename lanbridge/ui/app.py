@@ -35,6 +35,7 @@ from lanbridge import __version__
 from lanbridge.core.config import Settings, clean_device_name
 from lanbridge.core.protocol import CONSENT_TIMEOUT
 from lanbridge.network.discovery import Peer
+from lanbridge.ui.send_picker import SendPicker
 from lanbridge.ui.worker import Events, NetworkWorker
 
 
@@ -123,6 +124,15 @@ class MainWindow(QMainWindow):
         self.dialogs: list[QDialog] = []
         self.active_id = None
         self.transfers = {}
+        self.receiver_ready = False
+        self.discovery_settled = not worker.enable_discovery
+        self.file_manager_requests: list[list[Path]] = []
+        self.file_manager_picker: SendPicker | None = None
+        self.file_manager_timer = QTimer(self)
+        self.file_manager_timer.setSingleShot(True)
+        self.file_manager_timer.timeout.connect(self._file_manager_timeout)
+        if not self.discovery_settled:
+            QTimer.singleShot(3000, self._settle_discovery)
         self.setWindowTitle("LanBridge")
         self.setWindowIcon(app_icon())
         self.resize(720, 650)
@@ -228,8 +238,9 @@ class MainWindow(QMainWindow):
         events.error.connect(self.show_error)
         events.info.connect(self.status.setText)
         events.received.connect(self.received)
-        events.ready.connect(lambda port: self.status.setText(f"Ready to receive · port {port}"))
+        events.ready.connect(self._ready)
         events.forwarded.connect(self.set_files)
+        events.send_requested.connect(self.send_from_file_manager)
         events.pairing.connect(self.pairing_prompt)
         events.paired.connect(self.paired)
 
@@ -252,6 +263,8 @@ class MainWindow(QMainWindow):
                 self.device_list.setCurrentItem(item)
         self.empty.setVisible(not peers)
         self._selection()
+        if self.file_manager_picker:
+            self.file_manager_picker.set_peers(self._send_candidates())
 
     def _selection(self, *_):
         peer = self.selected_peer()
@@ -264,7 +277,7 @@ class MainWindow(QMainWindow):
         if paths:
             self.set_files([Path(p) for p in paths])
 
-    def set_files(self, paths):
+    def set_files(self, paths, *, reveal=True):
         self.paths = [Path(p).absolute() for p in paths]
         if self.paths:
             self.files_label.setText(
@@ -272,7 +285,80 @@ class MainWindow(QMainWindow):
                 + (f"\n… {len(self.paths)} files" if len(self.paths) > 8 else "")
             )
         self._selection()
-        self.reveal()
+        if reveal:
+            self.reveal()
+
+    def _ready(self, port):
+        self.receiver_ready = True
+        self.status.setText(f"Ready to receive · port {port}")
+        self._drain_file_manager_requests()
+
+    def _settle_discovery(self):
+        self.discovery_settled = True
+        self._drain_file_manager_requests()
+
+    def _send_candidates(self):
+        return [peer for peer in self.peers.values() if peer.id in self.worker.trust.peers]
+
+    def send_from_file_manager(self, paths):
+        paths = [Path(path).absolute() for path in paths]
+        if not paths:
+            self.reveal()
+            return
+        if len(self.file_manager_requests) >= 16:
+            self.show_error(
+                "Too many pending file-manager sends. Finish or cancel recipient selection first."
+            )
+            return
+        self.file_manager_requests.append(paths)
+        self._drain_file_manager_requests()
+
+    def _file_manager_timeout(self):
+        if self.file_manager_requests:
+            self.file_manager_requests.clear()
+            self.show_error("Could not start the file-manager send. Check receiver startup, then try again.")
+            self.reveal()
+
+    def _dispatch_file_manager(self, peer, paths):
+        current = self.peers.get(peer.id)
+        if current is None or current.id not in self.worker.trust.peers:
+            self.show_error("That paired device is no longer available. Choose another device.")
+            return False
+        self.set_files(paths, reveal=False)
+        self.worker.send(current, list(paths))
+        self.tray.showMessage(
+            "LanBridge", f"Sending {len(paths)} file(s) to {current.name}. Waiting for Accept."
+        )
+        return True
+
+    def _drain_file_manager_requests(self):
+        if not self.file_manager_requests or self.file_manager_picker:
+            return
+        if not self.receiver_ready or not self.discovery_settled:
+            if not self.file_manager_timer.isActive():
+                self.file_manager_timer.start(8000)
+            return
+        self.file_manager_timer.stop()
+        while self.file_manager_requests:
+            paths = self.file_manager_requests.pop(0)
+            candidates = self._send_candidates()
+            if len(candidates) == 1:
+                self._dispatch_file_manager(candidates[0], paths)
+                continue
+            dialog = SendPicker(
+                paths, lambda peer, paths=paths: self._dispatch_file_manager(peer, paths), self
+            )
+            self.file_manager_picker = dialog
+            dialog.set_peers(candidates)
+
+            def finished(_, dialog=dialog):
+                if self.file_manager_picker is dialog:
+                    self.file_manager_picker = None
+                QTimer.singleShot(0, self._drain_file_manager_requests)
+
+            dialog.finished.connect(finished)
+            self._open_dialog(dialog)
+            break
 
     def _send(self):
         if peer := self.selected_peer():
@@ -436,6 +522,7 @@ class MainWindow(QMainWindow):
         dialog.setWindowTitle("LanBridge settings")
         dialog.setMinimumWidth(540)
         layout = QFormLayout(dialog)
+        layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
         name = QLineEdit(self.settings.name)
         downloads = QLineEdit(str(self.settings.downloads))
         layout.addRow("Device name", name)
@@ -493,6 +580,28 @@ class MainWindow(QMainWindow):
         native_row.addWidget(install_button)
         native_row.addWidget(remove_button)
         layout.addRow(native_row)
+        integration_status = QLabel()
+        integration_status.setWordWrap(True)
+        integration_status.setTextFormat(Qt.TextFormat.PlainText)
+        layout.addRow(integration_status)
+
+        def refresh_integration():
+            from lanbridge.platform.integration import action_path
+
+            try:
+                path = action_path()
+                installed = path.exists()
+                integration_status.setText(
+                    f"File-manager action: {'Installed' if installed else 'Not installed'}\n{path}"
+                )
+                install_button.setText(
+                    "Reinstall file-manager action" if installed else "Install file-manager action"
+                )
+                remove_button.setEnabled(installed)
+            except OSError as exc:
+                integration_status.setText(str(exc))
+
+        refresh_integration()
 
         def native_action(install: bool):
             from lanbridge.platform import integration
@@ -500,9 +609,15 @@ class MainWindow(QMainWindow):
             try:
                 if install:
                     path = integration.install()
-                    QMessageBox.information(dialog, "File-manager integration", f"Installed: {path}")
+                    refresh_integration()
+                    QMessageBox.information(
+                        dialog,
+                        "File-manager integration",
+                        f"Installed: {path}\n\nThis updates the same file-manager action. No app was downloaded.",
+                    )
                 else:
                     integration.uninstall()
+                    refresh_integration()
                     QMessageBox.information(
                         dialog, "File-manager integration", "Removed the LanBridge file-manager action."
                     )

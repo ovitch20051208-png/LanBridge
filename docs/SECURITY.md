@@ -66,7 +66,10 @@ failure; retrying creates collision-suffixed files rather than overwriting.
 
 A per-user OS lock selects one primary process for a configuration. Named pipe /
 local socket messages require a fresh 256-bit token in the protected config
-directory, are size bounded and accept only absolute path lists. Windows socket
+directory, are size bounded and accept only absolute path lists plus a validated
+boolean send intent. An explicit file-manager send may choose the sole paired
+online recipient; ordinary file selection does not send. Multiple targets need
+a recipient click, and receiving still requires Accept/Decline. Windows socket
 permissions restrict access to the current user. macOS socket permission flags
 are not reliable; the protected token remains the authentication boundary.
 

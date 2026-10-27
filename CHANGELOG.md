@@ -10,6 +10,11 @@
   that also work while the main window is hidden.
 - Default new installations to Desktop/LanBridge Received; keep saved paths and
   support creating a destination by entering its path and saving in Settings.
+- Send directly from a file-manager action when one paired device is online;
+  otherwise choose once in a compact recipient picker. Receiver consent remains
+  mandatory. Ordinary Choose files still requires Send files.
+- Show persistent action installation state; Reinstall updates the same action
+  rather than downloading or duplicating the app.
 
 ## Documentation update
 

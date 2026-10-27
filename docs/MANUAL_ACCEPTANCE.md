@@ -23,7 +23,7 @@ Use a Windows 11 x86-64 machine and a real Apple Silicon Mac. No browser is used
 1. In Finder select a normal file, a Unicode/space-named file and an empty file.
 2. Right-click → Quick Actions/Services → **Send with LanBridge**.
 3. Confirm the already-running instance shows recipient selection; no second
-   unrelated instance stays running. Select the Windows computer → **Send files**.
+   unrelated instance stays running. With one paired online computer, the request starts directly; with several, click Windows in the compact recipient selector (no main-window Send files step).
 4. Without manually opening Windows LanBridge, confirm a foreground dialog shows
    sender, the complete file list, total size and Accept/Decline.
 5. Click **Accept**. Confirm progress and speed on both systems. Check files in

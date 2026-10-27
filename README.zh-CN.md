@@ -128,8 +128,8 @@ Artifacts 保留 14 天；过期后，仓库所有者可以通过 **Run workflow
 2. 打开 **Settings…**，点击 **Install file-manager action（安装文件管理器操作）**。
 3. Windows：选中文件 → 右键 → **显示更多选项** → **发送到** → **Send with LanBridge**。
 4. Mac：Finder 选中文件 → 右键 → **快速操作 / 服务** → **Send with LanBridge**。
-5. 已经在后台运行的 LanBridge 会显示接收设备选择界面；选择目标并点击 **Send files**，
-   对方仍需点击 **Accept**。
+5. 只有一台已配对在线设备时，已有实例直接发出请求；有多台时，在简洁列表点击目标就发送，
+   无需再点 **Send files**。接收方仍需每次点击 **Accept**。
 
 不需要管理员权限。移动程序后需要重新安装入口；移除时在设置中点击 **Remove action**。
 M3 上真实 Finder 入口、正常用户配置的单实例转交及向 Windows 发小文件已在 [M7](docs/M7_ACCEPTANCE.md) 验证；完整 Explorer / Finder 边界情况仍按[清单](docs/MANUAL_ACCEPTANCE.md)验收。

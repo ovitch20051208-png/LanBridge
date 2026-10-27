@@ -19,29 +19,35 @@ def test_ipc_validation(tmp_path):
         {"v": 1, "token": "wrong", "files": []},
         {"v": 1, "token": token, "files": ["relative"]},
         {"v": 1, "token": token, "files": ["bad\0"]},
+        {"v": 1, "token": token, "files": [str(path)], "send": "yes"},
     ):
         with pytest.raises(ValueError):
             validate_request(request, token)
 
 
-def test_single_instance_real_local_socket(tmp_path):
+@pytest.mark.parametrize("send", [False, True])
+def test_single_instance_real_local_socket(tmp_path, send):
     app = QApplication.instance() or QApplication([])
     root = private_directory(tmp_path / "state")
     received = []
-    first = SingleInstance(root, received.append)
+    sends = []
+    first = SingleInstance(root, received.append, sends.append)
     second = SingleInstance(root, lambda _: None)
     assert first.acquire()
     assert not second.acquire()
     paths = [tmp_path / "hello world.txt", tmp_path / "文件.txt"]
     try:
-        code = "from PySide6.QtCore import QCoreApplication; from pathlib import Path; import sys; from lanbridge.ipc.instance import SingleInstance; app=QCoreApplication([]); peer=SingleInstance(Path(sys.argv[1]),lambda _:None); sys.exit(0 if peer.forward([Path(p) for p in sys.argv[2:]]) else 1)"
-        process = subprocess.Popen([sys.executable, "-c", code, str(root), *map(str, paths)])
+        code = "from PySide6.QtCore import QCoreApplication; from pathlib import Path; import sys; from lanbridge.ipc.instance import SingleInstance; app=QCoreApplication([]); peer=SingleInstance(Path(sys.argv[1]),lambda _:None); sys.exit(0 if peer.forward([Path(p) for p in sys.argv[3:]],send=sys.argv[2]=='send') else 1)"
+        process = subprocess.Popen(
+            [sys.executable, "-c", code, str(root), "send" if send else "open", *map(str, paths)]
+        )
         deadline = time.monotonic() + 8
         while process.poll() is None and time.monotonic() < deadline:
             app.processEvents()
             time.sleep(0.005)
         assert process.wait(timeout=1) == 0
-        assert received == [paths]
+        assert received == ([] if send else [paths])
+        assert sends == ([paths] if send else [])
     finally:
         first.close()
         app.processEvents()
@@ -60,6 +66,8 @@ def test_finder_workflow_and_quoting(tmp_path):
     script = document["actions"][0]["action"]["ActionParameters"]["COMMAND_STRING"]
     assert script.endswith(' --send "$@"')
     assert script == workflow_document(command)["actions"][0]["action"]["ActionParameters"]["COMMAND_STRING"]
+    assert install_macos(command, destination=path) == path
+    assert sorted(p.name for p in (path / "Contents").iterdir()) == ["Info.plist", "document.wflow"]
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Real Windows COM shortcut API")
@@ -68,3 +76,5 @@ def test_windows_shortcut_native(tmp_path):
     assert shortcut.read_bytes()[:4] == b"L\0\0\0"
     assert shortcut.stat().st_size > 100
     assert str(shortcut).startswith(str(tmp_path))
+    assert install_windows([sys.executable, "-m", "lanbridge"], destination=shortcut) == shortcut
+    assert list(tmp_path.glob("*.lnk")) == [shortcut]

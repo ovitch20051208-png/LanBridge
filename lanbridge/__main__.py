@@ -10,7 +10,11 @@ from pathlib import Path
 def main() -> int:
     parser = argparse.ArgumentParser(description="LanBridge local desktop file transfer")
     parser.add_argument("files", nargs="*", type=Path)
-    parser.add_argument("--send", action="store_true", help="Show recipient selection for supplied files")
+    parser.add_argument(
+        "--send",
+        action="store_true",
+        help="Send files to the sole paired online device, or choose a recipient",
+    )
     parser.add_argument("--data-dir", type=Path, help="Isolated state directory for testing")
     parser.add_argument("--port", type=int, default=47384)
     parser.add_argument("--no-discovery", action="store_true")
@@ -57,9 +61,9 @@ def main() -> int:
     file_log.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
     logging.getLogger().addHandler(file_log)
     events = Events()
-    instance = SingleInstance(settings.directory, events.forwarded.emit)
+    instance = SingleInstance(settings.directory, events.forwarded.emit, events.send_requested.emit)
     if not instance.acquire():
-        if instance.forward(args.files):
+        if instance.forward(args.files, send=args.send):
             return 0
         logging.error("LanBridge is already running, but its local IPC did not respond")
         return 1
@@ -69,7 +73,10 @@ def main() -> int:
     app.aboutToQuit.connect(worker.stop)
     worker.start()
     if args.files:
-        window.set_files(args.files)
+        if args.send:
+            window.send_from_file_manager(args.files)
+        else:
+            window.set_files(args.files)
     elif not args.background:
         window.show()
     return app.exec()

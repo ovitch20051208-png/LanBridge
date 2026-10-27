@@ -7,6 +7,15 @@ from lanbridge.core.identity import Identity, TrustStore
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
+@pytest.fixture(scope="session")
+def qapp():
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance() or QApplication([])
+    app.setQuitOnLastWindowClosed(False)
+    return app
+
+
 @pytest.fixture
 def peers(tmp_path):
     a = Identity(tmp_path / "a")

@@ -134,8 +134,7 @@ First complete a transfer with **Choose files…**. Then, on each computer:
 2. Open **Settings…** and click **Install file-manager action**.
 3. Windows: select files → right-click → **Show more options** → **Send to** → **Send with LanBridge**.
 4. Mac: Finder select files → right-click → **Quick Actions / Services** → **Send with LanBridge**.
-5. The running LanBridge instance shows recipient selection. Select a target and
-   click **Send files**; the other computer still clicks **Accept**.
+5. With exactly one paired online device, the existing instance sends the request directly. With several, click a device in the compact selector to send immediately. The receiver still clicks **Accept**; no extra **Send files** click is needed.
 
 No administrator rights are required. Moving the app requires reinstalling the
 action. Use **Remove action** to remove it. Real M3 Finder forwarding and small-file transfers to Windows passed in [M7](docs/M7_ACCEPTANCE.md); the full Explorer/Finder edge-case checklist remains a release gate.
