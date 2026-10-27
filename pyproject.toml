@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Private, paired desktop file transfers over your local network"
 requires-python = ">=3.12"
 license = "MIT"
-dependencies = ["cryptography>=44", "platformdirs>=4,<5", "zeroconf>=0.147,<1", "ifaddr>=0.2", "PySide6>=6.8,<7"]
+dependencies = ["cryptography>=44", "platformdirs>=4,<5", "zeroconf>=0.147,<1", "ifaddr>=0.2", "PySide6-Essentials>=6.8,<7"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-asyncio>=0.25", "ruff>=0.11", "pyinstaller>=6.12"]

@@ -98,3 +98,19 @@ M5 follow-up: the final packaging commit's tests passed but its shell continued
 after an import-order lint failure. A separate corrective commit fixes the import
 and adds `scripts/check.py`, which fails immediately on lint/format/test errors.
 The complete gate was then rerun successfully (61 tests). This history is retained.
+
+## M6 — GitHub and CI
+
+Private repository created without replacing history:
+`https://github.com/ovitch20051208-png/LanBridge`.
+Each prior milestone and the M5 lint correction have been pushed separately.
+
+Added pinned, read-only GitHub Actions for Windows x86-64 and macOS 15 arm64,
+Python 3.12/3.13 test matrix, native packages, frozen executable checks and build
+artifacts. Added developer/rollback instructions, change log and lean Qt Essentials
+dependency configuration. No signing/publishing credentials are present.
+
+Local validation at the CI configuration checkpoint: full 61-test suite and lint /
+format gate. GitHub Actions execution is **pending** until the workflow is pushed
+and its actual results are inspected. The final verification entry below will
+record the observed result; workflow existence alone is not a passing run.

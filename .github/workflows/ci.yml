@@ -1,0 +1,100 @@
+name: LanBridge CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', 'README.md', 'CHANGELOG.md']
+  pull_request:
+    paths-ignore: ['docs/**', 'README.md', 'CHANGELOG.md']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lanbridge-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  QT_QPA_PLATFORM: offscreen
+  PYTHONUTF8: '1'
+
+jobs:
+  tests:
+    name: Test ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2025, macos-15]
+        python: ['3.12', '3.13']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
+      - name: Install development dependencies
+        run: python -m pip install -c constraints.txt -e ".[dev]"
+      - name: Lint, formatting and complete test suite
+        run: python scripts/check.py
+        env:
+          PYTEST_ADDOPTS: --junitxml=artifacts/tests.xml
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: tests-${{ matrix.os }}-py${{ matrix.python }}
+          path: artifacts/tests.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+  builds:
+    name: Build ${{ matrix.os }}
+    needs: tests
+    if: github.event_name != 'pull_request'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            executable: dist/LanBridge/LanBridge.exe
+          - os: macos-15
+            executable: dist/LanBridge.app/Contents/MacOS/LanBridge
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            constraints.txt
+      - run: python -m pip install -c constraints.txt -e ".[dev]"
+      - name: Build Windows portable distribution
+        if: runner.os == 'Windows'
+        run: python scripts/build.py
+      - name: Build Apple Silicon app, ZIP and DMG
+        if: runner.os == 'macOS'
+        run: python scripts/build.py --dmg
+      - name: Test actual frozen executable outside checkout
+        run: python scripts/smoke_bundle.py "${{ matrix.executable }}"
+      - name: Upload unsigned development distributions
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: LanBridge-${{ matrix.os }}-unsigned
+          path: |
+            dist/*.zip
+            dist/*.dmg
+          if-no-files-found: error
+          retention-days: 14
