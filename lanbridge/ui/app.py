@@ -9,6 +9,7 @@ from PySide6.QtGui import QAction, QColor, QDesktopServices, QIcon, QPainter, QP
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
+    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
@@ -24,6 +25,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QPushButton,
+    QScrollArea,
     QSystemTrayIcon,
     QVBoxLayout,
     QWidget,
@@ -82,7 +84,12 @@ class DecisionDialog(QDialog):
         self.text = QLabel(text)
         self.text.setTextFormat(Qt.TextFormat.PlainText)
         self.text.setWordWrap(True)
-        layout.addWidget(self.text)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.text)
+        scroll.setMinimumHeight(200)
+        scroll.setMaximumHeight(380)
+        layout.addWidget(scroll)
         buttons = QDialogButtonBox()
         self.accept_button = buttons.addButton(accept_label, QDialogButtonBox.ButtonRole.AcceptRole)
         buttons.addButton("Decline", QDialogButtonBox.ButtonRole.RejectRole)
@@ -114,6 +121,7 @@ class MainWindow(QMainWindow):
         self.peers: dict[str, Peer] = {}
         self.dialogs: list[QDialog] = []
         self.active_id = None
+        self.transfers = {}
         self.setWindowTitle("LanBridge")
         self.setWindowIcon(app_icon())
         self.resize(720, 650)
@@ -144,6 +152,9 @@ class MainWindow(QMainWindow):
         manual.clicked.connect(self._manual)
         row.addWidget(self.pair_button)
         row.addWidget(manual)
+        allow_pairing = QPushButton("Allow pairing (2 min)")
+        allow_pairing.clicked.connect(self.worker.allow_pairing)
+        row.addWidget(allow_pairing)
         row.addStretch()
         layout.addLayout(row)
         self.files_label = QLabel("Choose files or use Send with LanBridge in your file manager.")
@@ -161,6 +172,10 @@ class MainWindow(QMainWindow):
         row.addStretch()
         row.addWidget(self.send_button)
         layout.addLayout(row)
+        self.transfer_selector = QComboBox()
+        self.transfer_selector.setPlaceholderText("Transfer history")
+        self.transfer_selector.currentIndexChanged.connect(self._show_transfer)
+        layout.addWidget(self.transfer_selector)
         self.progress = QProgressBar()
         self.progress.setValue(0)
         layout.addWidget(self.progress)
@@ -207,6 +222,8 @@ class MainWindow(QMainWindow):
         events.received.connect(self.received)
         events.ready.connect(lambda port: self.status.setText(f"Ready to receive · port {port}"))
         events.forwarded.connect(self.set_files)
+        events.pairing.connect(self.pairing_prompt)
+        events.paired.connect(self.paired)
 
     def selected_peer(self) -> Peer | None:
         item = self.device_list.currentItem()
@@ -258,10 +275,22 @@ class MainWindow(QMainWindow):
             self.worker.pair(peer)
 
     def _manual(self):
+        mode, ok = QInputDialog.getItem(
+            self,
+            "Manual connection",
+            "Connection type:",
+            ["Pair a device", "Send to an already paired device"],
+            0,
+            False,
+        )
+        if not ok:
+            return
         text, ok = QInputDialog.getText(
             self,
             "Manual connection",
-            "Recipient IPv4 address and transfer port (for example 192.168.1.20:47384):",
+            "Recipient IPv4 address and "
+            + ("pairing" if mode == "Pair a device" else "transfer")
+            + " port (see the other computer's Settings):",
         )
         if not ok:
             return
@@ -273,6 +302,9 @@ class MainWindow(QMainWindow):
             port = int(port)
             if not 1 <= port <= 65535:
                 raise ValueError()
+            if mode == "Pair a device":
+                self.worker.pair_address(host, port)
+                return
             peer_id, ok = QInputDialog.getText(
                 self, "Paired identity", "Full device fingerprint from the other computer's Settings:"
             )
@@ -296,9 +328,7 @@ class MainWindow(QMainWindow):
     def incoming(self, payload):
         peer_id, offer, future = payload
         name = self.worker.trust.peers.get(peer_id, {}).get("name", peer_id[:16])
-        listing = "\n".join(f"• {item.name} ({human_size(item.size)})" for item in offer.files[:12])
-        if len(offer.files) > 12:
-            listing += f"\n… and {len(offer.files) - 12} more files"
+        listing = "\n".join(f"• {item.name} ({human_size(item.size)})" for item in offer.files)
         self._open_dialog(
             DecisionDialog(
                 "Incoming files",
@@ -308,7 +338,56 @@ class MainWindow(QMainWindow):
             )
         )
 
+    def pairing_prompt(self, payload):
+        peer, code, fingerprint, future = payload
+        self._open_dialog(
+            DecisionDialog(
+                "Verify device pairing",
+                f"Pair with {peer.name}?\n\nCompare ALL six code groups on both computers:\n\n{code}\n\nOnly choose Codes match if both screens show this exact code. If either screen differs, decline.\n\nPeer fingerprint:\n{fingerprint}",
+                future,
+                parent=self,
+                accept_label="Codes match",
+                timeout=120,
+            )
+        )
+
+    def paired(self, peer):
+        peers = dict(self.peers)
+        if peer:
+            existing = peers.get(peer.id)
+            peers[peer.id] = existing or peer
+        self.set_peers(list(peers.values()))
+
     def update_progress(self, value):
+        previous = self.transfers.get(value.id)
+        self.transfers[value.id] = value
+        index = self.transfer_selector.findData(value.id)
+        if index < 0:
+            self.transfer_selector.addItem("", value.id)
+            index = self.transfer_selector.count() - 1
+            self.transfer_selector.setCurrentIndex(index)
+        self.transfer_selector.setItemText(
+            index, f"{value.direction.capitalize()} {value.id[:8]} · {value.state}"
+        )
+        if self.transfer_selector.currentData() == value.id:
+            self._show_transfer()
+        if (
+            value.direction == "send"
+            and value.state == "complete"
+            and (not previous or previous.state != "complete")
+        ):
+            self.tray.showMessage("LanBridge", "Files sent and verified by the receiver.")
+        if len(self.transfers) > 50:
+            for request_id, progress in list(self.transfers.items()):
+                if request_id != self.active_id and progress.state in {"complete", "declined", "cancelled"}:
+                    self.transfers.pop(request_id)
+                    self.transfer_selector.removeItem(self.transfer_selector.findData(request_id))
+                    break
+
+    def _show_transfer(self, *_):
+        value = self.transfers.get(self.transfer_selector.currentData())
+        if value is None:
+            return
         self.active_id = value.id
         terminal = value.state in {"complete", "declined", "cancelled"} or value.state.startswith("error:")
         self.cancel_button.setEnabled(not terminal)
@@ -358,12 +437,32 @@ class MainWindow(QMainWindow):
         identity = QLineEdit(self.worker.identity.id)
         identity.setReadOnly(True)
         layout.addRow("Device fingerprint", identity)
+        from lanbridge.network.discovery import local_addresses
+
+        endpoints = QLabel(
+            "\n".join(
+                f"{address} · transfer {self.worker.port} · pairing {self.worker.pair_port}"
+                for address in local_addresses()
+            )
+        )
+        endpoints.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        layout.addRow("Manual connection", endpoints)
         trusted = QListWidget()
         for peer_id, record in self.worker.trust.peers.items():
             item = QListWidgetItem(f"{record['name']} · {peer_id[:16]}")
             item.setData(Qt.ItemDataRole.UserRole, peer_id)
             trusted.addItem(item)
         layout.addRow("Trusted devices", trusted)
+        forget = QPushButton("Forget selected device")
+        layout.addRow(forget)
+
+        def forget_selected():
+            item = trusted.currentItem()
+            if item:
+                self.worker.unpair(item.data(Qt.ItemDataRole.UserRole))
+                trusted.takeItem(trusted.row(item))
+
+        forget.clicked.connect(forget_selected)
         login = QCheckBox("Launch LanBridge in the background when I sign in")
         login.setChecked(self.settings.launch_at_login)
         layout.addRow(login)

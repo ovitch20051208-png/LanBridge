@@ -10,6 +10,8 @@ from lanbridge.core.storage import private_directory, read_json, write_json
 
 
 def clean_device_name(name: str) -> str:
+    if not isinstance(name, str):
+        raise ValueError("Device name must be text")
     name = name.strip()
     if not name or len(name.encode("utf-8")) > 100 or any(ord(c) < 32 for c in name):
         raise ValueError("Device name must be 1–100 UTF-8 bytes without control characters")

@@ -26,9 +26,28 @@ from lanbridge.core.protocol import (
     receive,
     send,
 )
+from lanbridge.core.storage import read_json, write_json
 
 log = logging.getLogger(__name__)
 Consent = Callable[[str, Offer], Awaitable[bool]]
+
+
+async def await_consent(reader: asyncio.StreamReader, decision: Awaitable[bool], timeout: float) -> bool:
+    consent_task = asyncio.create_task(decision)
+    disconnected = asyncio.create_task(reader.read(1))
+    try:
+        done, _ = await asyncio.wait(
+            [consent_task, disconnected], timeout=timeout, return_when=asyncio.FIRST_COMPLETED
+        )
+        if disconnected in done:
+            raise ProtocolError("Sender disconnected or sent content before acceptance")
+        if consent_task not in done:
+            raise TimeoutError("Transfer request timed out")
+        return consent_task.result()
+    finally:
+        consent_task.cancel()
+        disconnected.cancel()
+        await asyncio.gather(consent_task, disconnected, return_exceptions=True)
 
 
 @dataclass(frozen=True)
@@ -92,16 +111,32 @@ class TransferServer:
         self.consent_timeout = consent_timeout
         self.server = None
         self.active: dict[str, tuple[asyncio.Task, asyncio.StreamWriter]] = {}
+        self.active_peers: dict[str, str] = {}
         self.connections: set[asyncio.Task] = set()
-        self.seen: dict[str, float] = {}
+        self.replay_path = identity.directory / "replay.json"
+        self.seen: dict[str, float] = read_json(self.replay_path, {})
         self.context = None
 
     async def start(self, host: str = "127.0.0.1", port: int = 0) -> int:
+        self._clean_stale_staging()
         self.context = self.trust.context(self.identity, server=True)
         self.server = await asyncio.start_server(
             self._handle, host, port, ssl=self.context, ssl_handshake_timeout=10
         )
         return self.server.sockets[0].getsockname()[1]
+
+    def _clean_stale_staging(self):
+        directory = self.downloads.resolve()
+        for path in directory.glob(f".lanbridge-{self.identity.id[:16]}-*"):
+            if path.is_symlink() or not path.is_dir() or path.resolve().parent != directory:
+                continue
+            marker = path / ".owner"
+            if (
+                marker.is_file()
+                and not marker.is_symlink()
+                and marker.read_text(encoding="ascii") == self.identity.id
+            ):
+                shutil.rmtree(path)
 
     def refresh_trust(self):
         # SSL contexts used by an existing listener share this CA store. Exact pin
@@ -115,14 +150,20 @@ class TransferServer:
             writer.close()
             task.cancel()
 
+    def revoke(self, peer_id: str):
+        for request_id, owner in list(self.active_peers.items()):
+            if owner == peer_id:
+                self.cancel(request_id)
+
     async def close(self):
         if self.server:
             self.server.close()
-            await self.server.wait_closed()
         tasks = list(self.connections)
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
+        if self.server:
+            await self.server.wait_closed()
 
     async def _handle(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         task = asyncio.current_task()
@@ -135,34 +176,41 @@ class TransferServer:
                 raise ProtocolError("Receiver is busy")
             peer_id = self.trust.verify_socket(writer)
             offer = Offer.parse(await receive(reader))
-            now = time.monotonic()
+            now = time.time()
             self.seen = {key: expiry for key, expiry in self.seen.items() if expiry > now}
             if offer.id in self.seen:
                 raise ProtocolError("Replayed transfer request")
             if len(self.seen) >= 10000:
                 raise ProtocolError("Request rate limit reached")
             self.seen[offer.id] = now + 300
+            write_json(self.replay_path, self.seen)
             self.active[offer.id] = (task, writer)
-            accepted = await asyncio.wait_for(self.consent(peer_id, offer), self.consent_timeout)
+            self.active_peers[offer.id] = peer_id
+            accepted = await await_consent(reader, self.consent(peer_id, offer), self.consent_timeout)
             if not accepted:
                 await send(writer, "declined", id=offer.id)
                 self.progress(Progress(offer.id, "receive", 0, offer.total, 0, "declined"))
                 return
             # Unpairing while consent is open also revokes this pending offer.
             self.trust.verify_socket(writer, peer_id)
-            self.downloads.mkdir(parents=True, exist_ok=True)
-            if shutil.disk_usage(self.downloads).free < offer.total + 1024 * 1024:
+            directory = self.downloads.resolve()
+            directory.mkdir(parents=True, exist_ok=True)
+            if shutil.disk_usage(directory).free < offer.total + 1024 * 1024:
                 raise ProtocolError("Insufficient free space")
-            stage = Path(tempfile.mkdtemp(prefix=".lanbridge-", dir=self.downloads))
+            stage = Path(tempfile.mkdtemp(prefix=f".lanbridge-{self.identity.id[:16]}-", dir=directory))
             if os.name != "nt":
                 stage.chmod(0o700)
+            (stage / ".owner").write_text(self.identity.id, encoding="ascii")
             await send(writer, "accepted", id=offer.id)
             done, started = 0, time.monotonic()
             for index, spec in enumerate(offer.files):
                 digest = hashlib.sha256()
                 with (stage / str(index)).open("xb") as output:
+                    if os.name != "nt":
+                        os.fchmod(output.fileno(), 0o600)
                     remaining = spec.size
                     while remaining:
+                        self.trust.verify_socket(writer, peer_id)
                         data = await asyncio.wait_for(reader.read(min(CHUNK, remaining)), IO_TIMEOUT)
                         if not data:
                             raise ProtocolError("Sender disconnected before completion")
@@ -190,7 +238,7 @@ class TransferServer:
                 ):
                     raise ProtocolError("File integrity verification failed")
             for index, spec in enumerate(offer.files):
-                published.append(finalize(stage / str(index), self.downloads, spec.name))
+                published.append(finalize(stage / str(index), directory, spec.name))
             await send(writer, "complete", id=offer.id, files=[p.name for p in published])
             self.progress(
                 Progress(
@@ -206,6 +254,8 @@ class TransferServer:
         except asyncio.CancelledError:
             if offer:
                 self.progress(Progress(offer.id, "receive", 0, offer.total, 0, "cancelled"))
+            for path in published:
+                path.unlink(missing_ok=True)
             raise
         except (OSError, ValueError, ProtocolError, TimeoutError, asyncio.IncompleteReadError) as exc:
             log.info("Incoming transfer failed: %s", exc)
@@ -221,6 +271,7 @@ class TransferServer:
                 shutil.rmtree(stage, ignore_errors=True)
             if offer:
                 self.active.pop(offer.id, None)
+                self.active_peers.pop(offer.id, None)
             self.connections.discard(task)
             writer.close()
             with contextlib.suppress(OSError, TimeoutError):
@@ -242,6 +293,14 @@ async def send_files(
     writer = None
     done, started = 0, time.monotonic()
     progress(Progress(offer.id, "send", 0, offer.total, 0, "connecting"))
+    task = asyncio.current_task()
+
+    async def watch_cancellation():
+        while not cancellation.event.is_set():
+            await asyncio.sleep(0.05)
+        task.cancel()
+
+    watcher = asyncio.create_task(watch_cancellation())
     try:
         cancellation.check()
         ctx = trust.context(identity, server=False, peer_id=peer_id)
@@ -267,6 +326,7 @@ async def send_files(
                 remaining = spec.size
                 while remaining:
                     cancellation.check()
+                    trust.verify_socket(writer, peer_id)
                     data = stream.read(min(CHUNK, remaining))
                     if not data:
                         raise ProtocolError("Source file changed during transfer")
@@ -299,11 +359,18 @@ async def send_files(
             )
         )
         return "complete"
+    except asyncio.CancelledError:
+        progress(Progress(offer.id, "send", done, offer.total, 0, "cancelled"))
+        if cancellation.event.is_set():
+            raise TransferCancelled("Transfer cancelled") from None
+        raise
     except (OSError, ValueError, ProtocolError, TimeoutError, asyncio.IncompleteReadError) as exc:
         state = "cancelled" if isinstance(exc, TransferCancelled) else f"error: {exc}"
         progress(Progress(offer.id, "send", done, offer.total, 0, state))
         raise
     finally:
+        watcher.cancel()
+        await asyncio.gather(watcher, return_exceptions=True)
         if writer:
             writer.close()
             with contextlib.suppress(OSError, TimeoutError):

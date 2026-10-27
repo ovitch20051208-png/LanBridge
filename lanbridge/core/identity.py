@@ -18,6 +18,11 @@ def parse_certificate(pem: str) -> x509.Certificate:
     if not isinstance(pem, str) or len(pem) > 8192:
         raise ValueError("Invalid certificate size")
     cert = x509.load_pem_x509_certificate(pem.encode("ascii"))
+    canonical = cert.public_bytes(serialization.Encoding.PEM).decode("ascii")
+    if pem.strip() != canonical.strip() or cert.subject != cert.issuer:
+        raise ValueError("Expected exactly one self-signed identity certificate")
+    if not isinstance(cert.signature_hash_algorithm, hashes.SHA256):
+        raise ValueError("Unsupported certificate signature algorithm")
     key = cert.public_key()
     if not isinstance(key, ec.EllipticCurvePublicKey) or not isinstance(key.curve, ec.SECP256R1):
         raise ValueError("Unsupported identity key")

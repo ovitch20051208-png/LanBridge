@@ -50,3 +50,26 @@ directory. Finder workflow plist and shell quoting were validated structurally.
 Limitations: Finder execution, login startup and actual Explorer/Finder user
 interaction still need manual verification; no claim of Mac execution is made.
 Next: session-verified pairing, revocation and adversarial reliability coverage.
+
+## M4 — Security and reliability
+
+Added bounded, signed pairing with a 96-bit session code and approval on both
+devices, opt-in pairing window, persisted certificate pins, manual pairing,
+revocation, persistent replay cache, cancel/disconnect cleanup and restart cleanup.
+The GUI now supports selectable transfer history and notifications. Added
+security design, physical acceptance checklist and a two-process demo.
+
+Validation: **60 tests passed** (full suite), with real TLS and process-level
+networking. Coverage includes all 15 requested acceptance categories: identity /
+discovery, pairing, accept, decline, empty, multiple, Unicode, collisions,
+streaming, interruptions, untrusted peers, malformed input, checksum failure,
+cancel and receiver restart/disconnect. An active relay changing a signed
+Decline to Approve is rejected. A Qt integration test pairs two desktop workers,
+compares their actual dialog codes and completes a transfer to a hidden window.
+Lint also passed. Tests found and fixed shutdown ordering under active transfer.
+
+Limitations: no independent security audit; physical Mac ↔ Windows acceptance
+is unverified. Pairing interrupted during final commit may need repeating.
+Multi-file publication is not a single filesystem transaction; a crash can
+leave some complete files. Lost completion receipts are reported as failures.
+Next: native packaging, executable smoke checks and CI.

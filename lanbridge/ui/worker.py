@@ -10,7 +10,9 @@ from PySide6.QtCore import QObject, Signal
 
 from lanbridge.core.config import Settings
 from lanbridge.core.identity import Identity, TrustStore
+from lanbridge.core.protocol import TransferCancelled
 from lanbridge.network.discovery import Discovery, Peer
+from lanbridge.network.pairing import PairingServer, pair
 from lanbridge.network.transfer import Cancellation, TransferServer, send_files
 
 log = logging.getLogger(__name__)
@@ -26,6 +28,7 @@ class Events(QObject):
     ready = Signal(int)
     received = Signal(object)
     forwarded = Signal(object)
+    paired = Signal(object)
 
 
 class NetworkWorker:
@@ -39,6 +42,8 @@ class NetworkWorker:
         self.server = None
         self.discovery = None
         self.pairing = None
+        self.pair_port = 0
+        self.send_peers: dict[str, str] = {}
         self.sends: dict[str, tuple[asyncio.Task, Cancellation]] = {}
         self.pending: set[concurrent.futures.Future] = set()
 
@@ -63,6 +68,14 @@ class NetworkWorker:
     async def _consent(self, peer_id, offer):
         return await self.decision(self.events.consent, (peer_id, offer))
 
+    async def _pair_approval(self, peer, code, fingerprint):
+        return await self.decision(self.events.pairing, (peer, code, fingerprint))
+
+    def _paired(self, peer):
+        self.server.refresh_trust()
+        self.events.paired.emit(peer)
+        self.events.info.emit(f"Paired with {peer.name}. File transfers still require Accept.")
+
     async def _start(self):
         try:
             self.server = TransferServer(
@@ -74,9 +87,13 @@ class NetworkWorker:
                 lambda peer_id, paths: self.events.received.emit((peer_id, paths)),
             )
             self.port = await self.server.start("0.0.0.0", self.port)
+            self.pairing = PairingServer(
+                self.identity, self.trust, self.settings.name, self.port, self._pair_approval, self._paired
+            )
+            self.pair_port = await self.pairing.start("0.0.0.0")
             if self.enable_discovery:
                 self.discovery = Discovery(
-                    self.identity.id, self.settings.name, self.port, 0, self.events.peers.emit
+                    self.identity.id, self.settings.name, self.port, self.pair_port, self.events.peers.emit
                 )
                 try:
                     await self.discovery.start()
@@ -100,24 +117,68 @@ class NetworkWorker:
                 nonlocal current_id
                 current_id = value.id
                 self.sends[value.id] = (task, cancel)
+                self.send_peers[value.id] = peer.id
                 self.events.progress.emit(value)
 
             try:
                 await send_files(
                     self.identity, self.trust, peer.id, peer.host, peer.port, paths, progress, cancel
                 )
-            except asyncio.CancelledError:
+            except (asyncio.CancelledError, TransferCancelled):
                 self.events.info.emit("Transfer cancelled")
             except Exception as exc:
                 self.events.error.emit(f"Could not send files: {exc}")
             finally:
                 if current_id:
                     self.sends.pop(current_id, None)
+                    self.send_peers.pop(current_id, None)
 
         return self.submit(run())
 
     def pair(self, peer: Peer):
-        self.events.info.emit("Pairing will be available after the security milestone.")
+        return self.pair_address(peer.host, peer.pair_port, peer.id)
+
+    def pair_address(self, host: str, port: int, expected_id=None):
+        async def run():
+            try:
+                if not self.pairing or not port:
+                    raise ValueError("Wait for the receiver to start and check the pairing port")
+                peer = await pair(
+                    self.identity,
+                    self.trust,
+                    self.settings.name,
+                    self.port,
+                    host,
+                    port,
+                    self._pair_approval,
+                    expected_id,
+                )
+                self._paired(peer)
+            except Exception as exc:
+                self.events.error.emit(f"Could not pair: {exc}")
+
+        return self.submit(run())
+
+    def allow_pairing(self):
+        def action():
+            if self.pairing:
+                self.pairing.allow()
+                self.events.info.emit(
+                    f"Pairing allowed for 2 minutes · pairing port {self.pair_port}. Compare every code group on both devices."
+                )
+
+        self.loop.call_soon_threadsafe(action)
+
+    def unpair(self, peer_id):
+        def action():
+            self.trust.remove(peer_id)
+            self.server.revoke(peer_id)
+            for request_id, owner in list(self.send_peers.items()):
+                if owner == peer_id:
+                    self.cancel(request_id)
+            self.events.paired.emit(None)
+
+        self.loop.call_soon_threadsafe(action)
 
     def cancel(self, request_id: str):
         def action():

@@ -15,5 +15,7 @@ identity.json
 settings.json
 trust.json
 ipc.json
+replay.json
+instance.lock
 *.part
 artifacts/
