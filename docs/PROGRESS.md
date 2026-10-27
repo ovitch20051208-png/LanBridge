@@ -114,3 +114,63 @@ Local validation at the CI configuration checkpoint: full 61-test suite and lint
 format gate. GitHub Actions execution is **pending** until the workflow is pushed
 and its actual results are inspected. The final verification entry below will
 record the observed result; workflow existence alone is not a passing run.
+
+## Final observed verification — 2026-10-27
+
+**All six implementation milestones are committed and pushed.** The entries above
+record their checkpoint states; this section is the current verification result.
+
+Code/build source: `b17d388207526dc843b331d578f30928d320812a`.
+[GitHub Actions run 40571919800](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40571919800)
+finished **successfully**. All six jobs and artifact uploads were inspected:
+
+| Job | Observed result |
+| --- | --- |
+| Windows x86-64 / Python 3.12 | 61 passed; lint and formatting passed |
+| Windows x86-64 / Python 3.13 | 61 passed; lint and formatting passed |
+| macOS 15 arm64 / Python 3.12 | 60 passed, 1 Windows COM test skipped; lint/format passed |
+| macOS 15 arm64 / Python 3.13 | 60 passed, 1 Windows COM test skipped; lint/format passed |
+| Windows native build | Portable ZIP built, actual frozen Qt/TLS diagnostic passed, artifact uploaded |
+| macOS native build | arm64 .app, ZIP and DMG built, actual frozen Qt/TLS diagnostic passed, artifact uploaded |
+
+The Mac build's Mach-O CPU type, Bonjour metadata and clean source build manifest
+were independently inspected after download. The artifact ZIP digest matched
+GitHub's reported SHA-256. No Developer ID signature or notarization is claimed.
+The local Windows bundle was also rebuilt from a clean checkout of the same code
+commit using a fresh Essentials-only environment and passed the frozen diagnostic
+outside the source tree. Native Windows widget rendering was inspected.
+
+Delivered packages in the enclosing `outputs/` folder:
+
+| File | Origin | SHA-256 |
+| --- | --- | --- |
+| LanBridge-windows-x86_64-0.1.0.zip | Local Windows clean build, Python 3.12.10 | `3d41ddbda6c0f0563ceb1e5832883fa7ce6260d2a9d7d34b50f9cb3003671402` |
+| LanBridge-macos-arm64-0.1.0.dmg | Verified macOS CI build | `8ec83fa6a2671f472bbed300e6c7f7da60daa3b4198d5c4c1b22a9c7d8b1a2fd` |
+| LanBridge-macos-arm64-0.1.0.zip | Verified macOS CI build | `4db4d082dfd6745196f1ec961e5bd4fb334d5f27471eb85c2c5cf8faf66642b8` |
+
+`SHA256SUMS.txt` accompanies them. Generated packages, runtime state, certificates,
+private keys and caches are excluded from the Git source history. GitHub remains
+private; no force-push or history replacement was used. The final documentation
+commit only records this evidence and does not change the tested application.
+
+### Commit index
+
+| Milestone | Commit |
+| --- | --- |
+| M1 P2P core | `fee312f` |
+| M2 desktop / discovery | `f517264` |
+| M3 native integration / IPC | `68b8f26` |
+| M4 security / reliability | `35a84f6` |
+| M5 native packaging | `3fa2c2e` |
+| M5 check-gate correction | `d0966ac` |
+| M6 GitHub CI / native artifacts | `b17d388` |
+
+### Remaining release gates
+
+Physical Mac M3 ↔ Windows 11 transfers using real Finder/Explorer actions have
+**not** been performed. The macOS CI runner validates arm64 code and packaging,
+not that physical two-machine interaction. Complete MANUAL_ACCEPTANCE.md,
+clean-machine install/login-startup checks, publisher signing/notarization and
+dependency license review before calling this a production release. V1.0 resume,
+folders and auto-accept remain intentionally absent. These limits are not
+presented as completed acceptance tests.

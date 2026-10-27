@@ -7,6 +7,10 @@ storage is involved. Devices must be on a network that permits peer connections.
 Development release **0.1.0**. See [progress](docs/PROGRESS.md) for tested scope
 and limitations. This is not yet a signed, notarized or cross-device-certified release.
 
+Windows and Apple Silicon CI tests, native builds and packaged-executable checks
+passed in the [verified run](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40571919800).
+Download development packages from its Artifacts section (GitHub sign-in required).
+
 Select a nearby computer, pair by comparing the code on both screens, then send
 files. The receiver always chooses Accept or Decline. Close the main window to
 continue receiving through the tray/menu bar; use Quit to stop the application.
