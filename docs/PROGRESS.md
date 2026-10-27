@@ -1,7 +1,10 @@
 # Verification record
 
-Development host: Windows x86-64, Python 3.12.10. Physical macOS machine unavailable.
-Milestone commits are individually recoverable in Git history.
+M1–M6 development host: Windows x86-64, Python 3.12.10; a physical Mac was
+unavailable at those checkpoints. M7 below records the subsequent real M3 work.
+Earlier unavailable/unexecuted statements describe their historical checkpoints.
+Milestone commits are individually recoverable in Git history. Current physical
+evidence is summarized in [M7_ACCEPTANCE.md](M7_ACCEPTANCE.md).
 
 ## M1 — P2P core
 
@@ -314,3 +317,27 @@ valid LaunchAgent path/arguments checked, then disabled and removal verified;
 actual logout/login remains untested. The clean `cac55f8` DMG passed checksum,
 read-only mount, strict app signature and actual mounted frozen Qt/TLS/hash
 diagnostic. No clean-system, Developer ID or notarization result is claimed.
+
+M7 physical large-file/interruption phase (`cac55f8` app): **4 GiB completed in
+both directions**, average UI rates 26.4 MiB/s Mac → Windows and 36.4 MiB/s
+Windows → Mac. The reverse transfer came from the actual Windows Send To action
+after first-time installation; the initial preview still required Send files in
+its main window. Received bytes (4,294,967,296) and SHA-256 matched the original
+Mac source. Mac RSS peaks were 130.31 MiB sending and 81.59 MiB receiving; these
+are observations of this run, not a general performance claim.
+
+Sender cancellation while awaiting consent and during payload showed cancelled.
+The tester confirmed no Windows remnants after payload cancellation. Quitting
+the Windows receiver during payload produced **error: Connection lost** on Mac,
+never success; restarting Windows preserved Paired and the tester reported no
+residual files. Native Finder removal/reinstallation was verified by actual menu
+absence/reappearance; menu-bar Received Files opened the chosen Desktop folder.
+Light appearance was inspected and original Auto restored. `security find-identity`
+found zero signing identities; notarytool is present, signing/notarization remain
+unperformed. Evidence and actual screenshots are in M7_ACCEPTANCE.md.
+
+CI for `212af5b`: [run 40587559371](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40587559371)
+completed successfully in all six jobs. Python 3.12 logs were inspected: Windows
+**67 passed**, Mac **66 passed, 1 skipped**, docs/lint/format passed; both native
+builds and frozen executable diagnostics passed. Later interaction improvements
+requested by the tester are a separate implementation phase.

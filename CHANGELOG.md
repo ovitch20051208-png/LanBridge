@@ -30,6 +30,7 @@
 - Native packaging scripts, Windows portable bundle, Apple Silicon build workflow,
   automated tests and reproducible two-process checks.
 
-Development builds are unsigned/unnotarized. Physical Mac ↔ Windows acceptance,
-native Finder execution and clean-machine installation remain release gates.
+Development builds are unsigned/unnotarized. M7 has exercised real M3 Finder
+forwarding and physical Windows/Mac transfers; the full manual checklist and
+clean-machine installation remain release gates (see docs/M7_ACCEPTANCE.md).
 No folder transfer, resume, auto-accept, mobile client or cloud relay is included.

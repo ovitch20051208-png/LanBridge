@@ -24,9 +24,20 @@ contents are included. Fingerprints are public device identifiers.
   dialog with the main window hidden; the operator then clicked Accept.
 - `10-receive-complete.jpg`: physical three-file reverse transfer complete; all
   received hashes matched the original Mac sources.
+- `11-received-folder.jpg`: actual Finder directory opened by menu-bar Received
+  Files (tester clicked the item; operator observed the result).
+- `12-large-progress.jpg` / `13-large-send-complete.jpg`: physical 4 GiB send
+  progress and validated completion to Windows.
+- `14-send-cancelled.jpg`: physical sender cancellation during payload.
+- `15-light-appearance.jpg`: real native light appearance; the original Auto
+  system setting was restored afterward.
+- `16-receiver-quit-error.jpg`: physical Windows receiver Quit caused Connection
+  lost on the Mac sender, without a success state.
+- `17-large-background-incoming.jpg` / `18-large-receive-complete.jpg`: physical
+  Windows Send To entry → existing app → Mac consent → 4 GiB reverse completion.
 
 Images 01–04 use the clean `e8cd2d7` Mac build. Images 05–06 use the clean
-`cac55f8` build, as do 07–10. Both use native arm64 Python 3.12.16 / Qt 6.12.0. Older pictures
+`cac55f8` build, as do 07–18. Both use native arm64 Python 3.12.16 / Qt 6.12.0. Older pictures
 retain their original button appearance as evidence of the first transfer.
 Screenshot speeds for tiny files include waiting/decision time; they are not
 network performance measurements. Addresses, paths and device identifiers are

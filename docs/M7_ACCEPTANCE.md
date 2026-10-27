@@ -43,7 +43,17 @@ finished.
 | Three-file Windows → hidden Mac | Request `3eaf4370…`: the operator observed the standalone Incoming files dialog while the main window was hidden and clicked Accept. Mac displayed receive complete, 78/78 B; tester confirmed Windows complete. All three files in the Mac Desktop folder matched the original source SHA-256, completing an actual Mac → Windows → Mac round trip. No staging directories remained. |
 | Desktop folder selection | In the actual Mac app: Settings → Browse → Desktop → New Folder → Create → Open → Save. Saved path is Desktop/LanBridge Received. |
 | Login setting | Enabled via real settings, verified valid LaunchAgent with the fixed app path and --background, disabled via settings, verified removal and saved false. Actual logout/login remains pending. |
-| Window close vs Quit | Closing the Mac main window preserved its TCP listener/process; normal Quit removed the process before replacement. Menu-bar-specific actions remain to be verified. |
+| Window close vs Quit | Closing the Mac main window preserved its TCP listener/process; normal Quit removed the process before replacement. Menu-bar Received Files was exercised with tester assistance below. |
+| Menu-bar Received Files | Tester clicked the Mac menu item; operator then observed Finder open Desktop/LanBridge Received with the actual received test files. |
+| Finder removal / reinstall | Operator clicked Remove action in native Settings; workflow disappeared from disk and Send with LanBridge disappeared from the real Finder context menu. Reinstall restored both. The running transfer continued while settings remained responsive. |
+| 4 GiB Mac → Windows | Request `d8dea1cc…`: actual Finder invocation, progress and speed observed, completed at 4/4 GiB with a validated receipt, average 26.4 MiB/s. Tester confirmed complete receipt on Windows. |
+| Mac memory during 4 GiB send | 168 one-second RSS samples over 169.48 s (includes request/decision time): start 62.86 MiB, peak 130.31 MiB, final 58.66 MiB. This measures this Mac run, not Windows memory or a general throughput guarantee. |
+| Cancel while waiting | Request `2bebbf3a…`: operator cancelled on Mac while waiting for acceptance; task became cancelled with no payload progress. Windows dialog disappearance was not independently observed. |
+| Cancel during payload | Request `7f8a3b33…`: payload progress observed past 484.5 MiB, then operator cancelled at approximately 13%; task became cancelled. Tester confirmed no Windows remnants after cancellation. |
+| Receiver Quit during payload | Request `410facac…`: tester accepted, then quit Windows from its tray. Mac showed error: Connection lost at approximately 9%, never complete. Tester restarted Windows, confirmed Paired persisted and no interrupted-transfer remnants remained. |
+| Appearance | Native light appearance inspected alongside the dark screenshots; OS appearance was restored to its original Auto setting. |
+| 4 GiB Windows → hidden Mac | Tester installed the actual Windows Send To action, invoked it from Explorer and clicked Send files in the existing preview app. Operator accepted the standalone Mac prompt with main window hidden. Request `e6f5b3f1…` completed at 4/4 GiB, UI average 36.4 MiB/s; received SHA-256 matched the original Mac source exactly, with no Mac staging leftovers. Tester confirmed Windows finished sending. |
+| Mac memory during reverse send | 500 one-second RSS samples, including setup and waiting: peak 81.59 MiB, final 36.77 MiB. The 506.26 s sampling window includes installation/user setup time and is not the payload duration. |
 
 ![Finder selection on the real Mac](images/mac-m7/02-finder-selection.jpg)
 
@@ -57,6 +67,18 @@ finished.
 
 ![Mac receive completion for the three-file round trip](images/mac-m7/10-receive-complete.jpg)
 
+![Actual 4 GiB transfer progress](images/mac-m7/12-large-progress.jpg)
+
+![Actual 4 GiB sender completion](images/mac-m7/13-large-send-complete.jpg)
+
+![Real payload cancellation](images/mac-m7/14-send-cancelled.jpg)
+
+![Receiver Quit reported as Connection lost](images/mac-m7/16-receiver-quit-error.jpg)
+
+![Explorer-originated large offer on a hidden Mac](images/mac-m7/17-large-background-incoming.jpg)
+
+![4 GiB reverse receive complete](images/mac-m7/18-large-receive-complete.jpg)
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |
@@ -64,6 +86,7 @@ finished.
 | `01 Mac hello.txt` | 37 | `4877bb69a9a4b2443be1dab75950cbc958e36760b378c415b2c2f7b7d3430a1b` |
 | `中文 文件.txt` | 41 | `8e86973ec5151c3a279ea0ab8acb1a195e8783f6bc9884444a9fe73a1dbefdf0` |
 | `empty.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| `large 4 GiB.bin` | 4,294,967,296 | `8479e43911dc45e89f934fe48d01297e16f51d17aa561d4d1c216b1ae0fcddca` |
 
 ## Automated checks
 
