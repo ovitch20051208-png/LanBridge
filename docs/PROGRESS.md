@@ -16,3 +16,20 @@ independent configurations cover accepted/declined/empty/Unicode/multiple files,
 
 Limitations at this checkpoint: test-provisioned trust only; no GUI, native
 integration or user pairing yet. Next: desktop UI and discovery.
+
+## M2 — Desktop application
+
+Added Qt main window, recipient selection, foreground Accept/Decline dialog,
+threaded asyncio receiver, progress/speed, settings and tray/menu actions.
+Added stable-ID mDNS advertising and browsing (`ui/*`, `network/discovery.py`,
+`core/config.py`, entry point, desktop tests and multicast smoke utility).
+
+Validation: **14 pytest tests passed**, including an actual TLS send into the
+background desktop worker with acceptance through its Qt dialog. A separate
+`python scripts/smoke_discovery.py` run passed: two live mDNS advertisers
+discovered each other on this host. The smoke run found and fixed a DNS label
+length issue before this commit.
+
+Limitations: pairing UI/protocol and secure single-instance forwarding are
+scheduled for M4/M3. Real two-computer discovery and Mac UI remain unverified.
+Next: native integrations and single-instance IPC.
