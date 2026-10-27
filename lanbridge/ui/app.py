@@ -329,7 +329,11 @@ class MainWindow(QMainWindow):
     def _open_dialog(self, dialog: QDialog):
         self.dialogs.append(dialog)
         dialog.finished.connect(lambda _: self.dialogs.remove(dialog) if dialog in self.dialogs else None)
-        dialog.open()
+        # open() makes a window-modal sheet on macOS. A menu-bar receiver may
+        # have a hidden parent, so use a standalone application-modal dialog.
+        # show() is asynchronous; consent still resolves only through finished.
+        dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
+        dialog.show()
         dialog.raise_()
         dialog.activateWindow()
 

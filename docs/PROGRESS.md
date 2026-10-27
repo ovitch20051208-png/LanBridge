@@ -270,3 +270,15 @@ as clickable. The previous rounded-button stylesheet left secondary actions
 looking like plain text. Added visible, palette-based button borders/backgrounds
 and a distinct disabled primary-button appearance. Full gate remains **64 passed,
 1 skipped**; native visual verification follows in the next build.
+
+M7 background prompt adjustment: during the first reverse physical request the
+computer-control tool captured the hidden parent as a blank window and could not
+access its sheet. The tester subsequently confirmed clicking Accept on the Mac;
+an empty test file was saved, with the expected empty-file SHA-256 and no staging
+directories. Therefore this is **not evidence that the app failed to display a
+prompt to the user**. Use asynchronous application-modal standalone dialogs
+instead of window-modal sheets, so background prompts do not depend on a visible
+main window. Consent and pairing still require explicit decisions. Strengthened
+the hidden-recipient integration check to verify dialog exposure while the main
+window stays unexposed. Full offscreen gate: **64 passed, 1 skipped**; the complete
+desktop test module also passed with the native Cocoa plugin (**12 passed**).
