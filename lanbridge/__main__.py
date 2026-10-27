@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import logging
-from logging.handlers import RotatingFileHandler
 import sys
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 
@@ -51,8 +51,9 @@ def main() -> int:
     app.setOrganizationName("LanBridge")
     app.setQuitOnLastWindowClosed(False)
     settings = Settings.load(args.data_dir)
-    file_log = RotatingFileHandler(settings.directory / "lanbridge.log", maxBytes=2 * 1024**2,
-                                   backupCount=2, encoding="utf-8")
+    file_log = RotatingFileHandler(
+        settings.directory / "lanbridge.log", maxBytes=2 * 1024**2, backupCount=2, encoding="utf-8"
+    )
     file_log.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
     logging.getLogger().addHandler(file_log)
     events = Events()

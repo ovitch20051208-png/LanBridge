@@ -93,3 +93,8 @@ clean Windows VM. User-level installation is provided but not installed into the
 developer's account. Mac build and DMG are pending CI or physical arm64 execution.
 No publisher signing or notarization is claimed. Next: GitHub Actions and inspect
 the actual run results.
+
+M5 follow-up: the final packaging commit's tests passed but its shell continued
+after an import-order lint failure. A separate corrective commit fixes the import
+and adds `scripts/check.py`, which fails immediately on lint/format/test errors.
+The complete gate was then rerun successfully (61 tests). This history is retained.
