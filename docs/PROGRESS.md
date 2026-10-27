@@ -209,3 +209,43 @@ the new documentation gate and both actual frozen-executable diagnostics. The
 offline bilingual reader also passed static JavaScript syntax and embedded-content
 checks: all four documents, 28 image references, and no external scripts. The
 browser's local-file preview restriction was not bypassed.
+
+## M7 — Physical Mac baseline — 2026-10-27
+
+The checkout was clean and `git fetch origin main` confirmed both local and remote
+main at `200b0831c1c1279a1c5ef0fa2b03c8ed51f9ac90`; no history was reset.
+GitHub repository metadata now reports **public** (earlier entries describe its
+previous private state). No applicable AGENTS.md was present.
+
+Host: real **Apple M3**, **macOS 15.7 (24G222)**, native **arm64 Python 3.12.16**
+installed with Homebrew; Command Line Tools were present. The default Python 3.13
+was not used for packaging. Homebrew's initial post-install failed while reading
+a newer formula; updating Homebrew and rerunning postinstall resolved it.
+
+Installed `-c constraints.txt -e ".[dev]"` in `.venv`; `pip check` passed.
+`scripts/check.py`: documentation links/images, Ruff lint/format, **60 passed,
+1 Windows-only COM test skipped**. Both two-process demos passed (accepted 12 MiB
+plus empty file with hashes checked; declined without downloads), and two live
+mDNS advertisers discovered each other on this Mac. These remain local tests.
+
+`sh scripts/build_macos.sh` produced an arm64 app, ZIP and DMG from the clean source
+above. The frozen executable passed its outside-checkout Qt dialog / mutual-TLS /
+SHA-256 diagnostic. BUILD-INFO reports `source_dirty=false`, Python 3.12.16,
+Qt 6.12.0 and arm64. Baseline archive SHA-256:
+
+- ZIP: `bfedc8f9190c4582c584156ff2d17d60a91c637d43b90d5e1df312f22f0be99e`
+- DMG: `c542686c4a950eef4eef97f083a74155e9241a68a1948c754ee1b7734e80765e`
+
+Copied the app to `/Applications/LanBridge.app`, opened its actual native window
+and settings, saved a distinct device name/custom test receive directory, and
+installed the Finder action from the app. Normal user state is used for this
+physical flow; tests above used isolated temporary identities. No keys, tokens,
+runtime configuration or build caches are committed.
+
+Initial physical discovery found the Windows device, but pairing failed: its
+advertisement included four link-local adapters plus a reachable LAN address;
+`parse_peer` selected the first, unreachable link-local address. The timeout
+displayed an empty `Could not pair:` message. Strict bundle signature validation
+also found dangling QtSvg symlinks left by binary-only module filtering. These
+are observed issues to repair next, not successful pairing/Finder transfer gates.
+No physical two-computer file transfer has completed at this checkpoint.
