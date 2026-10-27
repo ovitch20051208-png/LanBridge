@@ -161,12 +161,15 @@ def keep_binary(entry):
         if category not in {{'platforms', 'styles', 'imageformats', 'tls', 'networkinformation'}}:
             return False
     forbidden = ('Pdf', 'Qml', 'Quick', 'VirtualKeyboard', 'Svg')
-    return not any(('Qt6' + name) in path or ('Qt' + name + '.framework') in path for name in forbidden)
+    paths = (path, entry[1].replace('\\\\', '/'))
+    return not any(('Qt6' + name) in candidate or ('Qt' + name + '.framework') in candidate
+                   for name in forbidden for candidate in paths)
 a = Analysis([{str(ROOT / "scripts/launcher.py")!r}], pathex=[{str(ROOT)!r}],
     binaries=[], datas=[({str(notices)!r}, 'notices')], hiddenimports=collect_submodules('zeroconf', filter=lambda name: '.test' not in name) + collect_submodules('ifaddr', filter=lambda name: '.test' not in name), hookspath=[], hooksconfig={{}}, runtime_hooks=[],
     excludes=['PySide6.QtWebEngineCore', 'PySide6.QtWebEngineWidgets', 'PySide6.QtQml', 'PySide6.QtQuick', 'tkinter', 'pytest'],
     noarchive=False, optimize=1)
 a.binaries = [entry for entry in a.binaries if keep_binary(entry)]
+a.datas = [entry for entry in a.datas if keep_binary(entry)]
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='LanBridge',
     debug=False, bootloader_ignore_signals=False, strip=False, upx=False, console=False,
@@ -203,6 +206,14 @@ coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name='LanBridge
         plist = plistlib.loads((app_path / "Contents/Info.plist").read_bytes())
         if plist["NSBonjourServices"] != ["_lanbridge._tcp"]:
             raise RuntimeError("Local-network bundle metadata missing")
+        broken_links = [
+            str(path.relative_to(app_path))
+            for path in app_path.rglob("*")
+            if path.is_symlink() and not path.exists()
+        ]
+        if broken_links:
+            raise RuntimeError(f"Broken bundle symlinks: {broken_links}")
+        subprocess.run(["codesign", "--verify", "--deep", "--strict", str(app_path)], check=True)
         archive = str(ROOT / "dist/LanBridge-macos-arm64-0.1.0.zip")
         subprocess.run(
             ["ditto", "-c", "-k", "--sequesterRsrc", "--keepParent", str(app_path), archive], check=True

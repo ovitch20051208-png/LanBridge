@@ -256,3 +256,11 @@ The actual Windows LAN endpoint was reachable on both advertised ports. Added
 regression coverage for adapter ordering and a useful pairing timeout message;
 `scripts/check.py` passed: **64 passed, 1 skipped**, documentation/lint/format
 passed. Physical pairing will be retried with the rebuilt native application.
+
+M7 packaging correction: apply unused-Qt filtering to data/symlink entries as
+well as binaries, including each symlink target. The rebuilt app has no dangling
+links and now passes `codesign --verify --deep --strict`; that validation and a
+broken-link check run before every Mac archive build. Recorded macOS-only
+`macholib==1.16.4` in the dependency constraints. Full gate: **64 passed, 1 skipped**;
+arm64 app/ZIP/DMG build and actual frozen Qt/TLS/hash diagnostic passed again.
+This validates the ad-hoc signature's integrity, not Developer ID or notarization.
