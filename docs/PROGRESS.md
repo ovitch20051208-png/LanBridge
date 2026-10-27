@@ -358,3 +358,17 @@ cross-process IPC intent forwarding, real paired TLS delivery with a hidden
 sender and explicit receiver consent, multiple-target one-click selection,
 unpaired/offline/revoked targets, empty selections and repeated native action
 installation. Rebuilt-bundle and physical direct-send checks follow separately.
+
+The clean `7af38d6` arm64 bundle passed strict signature and frozen Qt/TLS/hash
+checks. Physical Finder **cold-start direct send** completed (`7fd9f2dd…`, 37 B):
+the app was not running, Finder launched it with --send, and Windows received its
+request without a main-window Send files click. A second real Finder action sent
+a Chinese/space-named file through the existing PID 34896 (`65de2700…`, 41 B),
+also complete without Send files. Windows acceptance/receipt was reported by the
+tester; both completions were observed on Mac. Reinstall showed the persistent
+Installed state, updated the same sole workflow and retained one app process.
+
+Native screenshot QA found the expanded settings form could compress its wrapped
+directory hint. Widened the form and reserved font-scaled hint height. The full
+gate after this layout adjustment remained **74 passed, 1 skipped**; rebuilt
+visual verification is recorded next rather than inferred from the tests.

@@ -520,7 +520,7 @@ class MainWindow(QMainWindow):
     def show_settings(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("LanBridge settings")
-        dialog.setMinimumWidth(540)
+        dialog.setMinimumWidth(760)
         layout = QFormLayout(dialog)
         layout.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
         name = QLineEdit(self.settings.name)
@@ -541,6 +541,7 @@ class MainWindow(QMainWindow):
             "Choose a folder with Browse…, or enter a new folder path.\nSave creates the folder if needed."
         )
         directory_hint.setWordWrap(True)
+        directory_hint.setMinimumHeight(directory_hint.fontMetrics().lineSpacing() * 3)
         layout.addRow("", directory_hint)
         identity = QLineEdit(self.worker.identity.id)
         identity.setReadOnly(True)
