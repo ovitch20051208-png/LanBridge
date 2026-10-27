@@ -201,3 +201,11 @@ blocked by the browser URL policy; the preview is delivered for the user to open
 Application behavior and desktop binaries are unchanged by this documentation
 milestone. Native file-manager and physical Mac ↔ Windows acceptance remain the
 next user testing steps described in the guide and manual acceptance checklist.
+
+Documentation CI follow-up: source commit `98b18fa2099b17bfc3bb9567aa80599073848f0c`
+passed [run 40580159815](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40580159815).
+All six Windows/macOS test and native build jobs completed successfully, including
+the new documentation gate and both actual frozen-executable diagnostics. The
+offline bilingual reader also passed static JavaScript syntax and embedded-content
+checks: all four documents, 28 image references, and no external scripts. The
+browser's local-file preview restriction was not bypassed.
