@@ -264,3 +264,9 @@ broken-link check run before every Mac archive build. Recorded macOS-only
 `macholib==1.16.4` in the dependency constraints. Full gate: **64 passed, 1 skipped**;
 arm64 app/ZIP/DMG build and actual frozen Qt/TLS/hash diagnostic passed again.
 This validates the ad-hoc signature's integrity, not Developer ID or notarization.
+
+M7 usability correction: the tester could not recognize **Allow pairing (2 min)**
+as clickable. The previous rounded-button stylesheet left secondary actions
+looking like plain text. Added visible, palette-based button borders/backgrounds
+and a distinct disabled primary-button appearance. Full gate remains **64 passed,
+1 skipped**; native visual verification follows in the next build.

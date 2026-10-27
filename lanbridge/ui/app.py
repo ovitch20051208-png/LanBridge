@@ -195,7 +195,14 @@ class MainWindow(QMainWindow):
         row.addWidget(settings_button)
         layout.addLayout(row)
         self.setStyleSheet(
-            "QPushButton { padding: 8px 14px; border-radius: 7px; } QPushButton#primary { background: #3874f2; color: white; } QListWidget { border-radius: 9px; padding: 6px; } QProgressBar { min-height: 14px; border-radius: 6px; }"
+            "QPushButton { padding: 8px 14px; border: 1px solid palette(mid); border-radius: 7px; "
+            "background: palette(button); color: palette(button-text); } "
+            "QPushButton:hover:enabled { border-color: palette(highlight); } "
+            "QPushButton:pressed { background: palette(midlight); } "
+            "QPushButton:disabled { color: palette(mid); background: palette(window); } "
+            "QPushButton#primary:enabled { background: #3874f2; color: white; } "
+            "QListWidget { border-radius: 9px; padding: 6px; } "
+            "QProgressBar { min-height: 14px; border-radius: 6px; }"
         )
         self.tray = QSystemTrayIcon(self.windowIcon(), self)
         self.tray.setToolTip("LanBridge")
