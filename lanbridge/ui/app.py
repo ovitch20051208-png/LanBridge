@@ -4,7 +4,7 @@ import concurrent.futures
 import time
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtCore import QRect, Qt, QTimer, QUrl
 from PySide6.QtGui import QAction, QColor, QDesktopServices, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -46,10 +46,11 @@ def human_size(value: float) -> str:
     return ""
 
 
-def app_icon() -> QIcon:
-    pixmap = QPixmap(64, 64)
+def app_icon(size: int = 64) -> QIcon:
+    pixmap = QPixmap(size, size)
     pixmap.fill(Qt.GlobalColor.transparent)
     painter = QPainter(pixmap)
+    painter.scale(size / 64, size / 64)
     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     painter.setBrush(QColor("#3874f2"))
     painter.setPen(Qt.PenStyle.NoPen)
@@ -59,7 +60,7 @@ def app_icon() -> QIcon:
     font.setPixelSize(31)
     font.setBold(True)
     painter.setFont(font)
-    painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "LB")
+    painter.drawText(QRect(0, 0, 64, 64), Qt.AlignmentFlag.AlignCenter, "LB")
     painter.end()
     return QIcon(pixmap)
 

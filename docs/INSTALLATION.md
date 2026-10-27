@@ -3,6 +3,7 @@
 ## Source development
 
 Use Python 3.12+ and a virtual environment, then `python -m pip install -e ".[dev]"`.
+For the verified dependency set add `-c constraints.txt` to the install command.
 Start with `python -m lanbridge`. Use `--data-dir <absolute-directory> --port 0`
 for an isolated second test instance. Logs go to the launching console;
 `--verbose` enables diagnostic logging.
@@ -39,3 +40,64 @@ at the next login. No administrator rights or firewall changes are requested.
 Native Finder execution and real Mac/Windows file-manager acceptance remain
 manual release gates. The Windows test creates a real shortcut in a temporary
 directory; it does not install an action in the developer's personal Send To folder.
+
+## Windows portable distribution
+
+Extract the complete `LanBridge-windows-x86_64-0.1.0.zip` archive to a permanent
+folder. Run `LanBridge/LanBridge.exe`. Keep the `_internal` folder beside the
+executable. Python is embedded; users do not need a Python installation.
+To install for the current user and optionally add Send To:
+
+```powershell
+powershell -NoProfile -File scripts/install_windows.ps1 -Archive <zip-path> -InstallSendTo
+```
+
+This places the app under `%LOCALAPPDATA%\Programs\LanBridge` and creates a Start
+menu shortcut. It does not change the firewall, request elevation or enable
+login startup. Quit the old instance before updating. Remove with
+`powershell -NoProfile -File scripts/uninstall_windows.ps1`; received files and
+application state are preserved. These user-level install scripts are provided
+with the source; the portable bundle is also directly usable.
+
+## macOS development distribution
+
+On a native arm64 Python environment:
+
+```
+python3 -m pip install -c constraints.txt -e '.[dev]'
+sh scripts/build_macos.sh
+```
+
+The build produces `dist/LanBridge.app`, an arm64 ZIP and a development DMG.
+Copy the app into Applications before installing the Finder action. Accept the
+macOS Local Network permission prompt if shown. The bundle declares its Bonjour
+service and local-network usage.
+
+## Building and diagnostics
+
+Windows: `python scripts/build.py`, then
+`python scripts/smoke_bundle.py dist/LanBridge/LanBridge.exe`.
+Mac: the shell script above builds and runs the same diagnostic on the bundle.
+The diagnostic launches the actual frozen executable outside the checkout,
+loads its Qt platform plugin, accepts a test dialog, transfers a Unicode file
+over mutual TLS and checks the bytes. It creates only temporary loopback state.
+
+`LanBridge --self-test-report <absolute-json-path>` writes a diagnostic report
+without a normal desktop session. `notices/BUILD-INFO.json` inside the bundle's
+resources records the source commit, dirty state, Python, dependency versions
+and architecture. Startup errors in normal packaged mode are written to the
+OS's per-user LanBridge log directory and shown in an actionable error dialog.
+
+## Signing status
+
+Development builds are **not signed with a Windows publisher certificate** and
+**not Developer ID signed or notarized**. Windows SmartScreen and macOS
+Gatekeeper may warn or block. Verify the source and archive hash before making
+an explicit OS exception; do not disable system-wide protections.
+
+PyInstaller may apply an ad-hoc Mac signature for Apple Silicon execution; this
+does not identify a publisher or constitute notarization. Public distribution
+needs Windows Authenticode signing or macOS Developer ID hardened-runtime
+signing, notarization (`notarytool`) and stapling, using owner-controlled
+credentials. No signing credentials are included or configured here. Dependency
+license and source-access obligations are described in THIRD_PARTY_NOTICES.md.

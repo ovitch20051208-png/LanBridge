@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+from logging.handlers import RotatingFileHandler
 import sys
 from pathlib import Path
 
@@ -17,7 +18,14 @@ def main() -> int:
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--install-integration", action="store_true")
     parser.add_argument("--uninstall-integration", action="store_true")
+    parser.add_argument(
+        "--self-test-report", type=Path, help="Run isolated loopback/Qt diagnostics and write JSON"
+    )
     args = parser.parse_args()
+    if args.self_test_report:
+        from lanbridge.selftest import run
+
+        return run(args.self_test_report)
     if args.install_integration or args.uninstall_integration:
         from lanbridge.platform import integration
 
@@ -29,6 +37,7 @@ def main() -> int:
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+        handlers=[logging.StreamHandler()] if sys.stderr else [],
     )
     from PySide6.QtWidgets import QApplication
 
@@ -42,6 +51,10 @@ def main() -> int:
     app.setOrganizationName("LanBridge")
     app.setQuitOnLastWindowClosed(False)
     settings = Settings.load(args.data_dir)
+    file_log = RotatingFileHandler(settings.directory / "lanbridge.log", maxBytes=2 * 1024**2,
+                                   backupCount=2, encoding="utf-8")
+    file_log.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    logging.getLogger().addHandler(file_log)
     events = Events()
     instance = SingleInstance(settings.directory, events.forwarded.emit)
     if not instance.acquire():

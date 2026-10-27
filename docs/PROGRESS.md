@@ -73,3 +73,23 @@ is unverified. Pairing interrupted during final commit may need repeating.
 Multi-file publication is not a single filesystem transaction; a crash can
 leave some complete files. Lost completion receipts are reported as failures.
 Next: native packaging, executable smoke checks and CI.
+
+## M5 — Packaging and installation
+
+Added native PyInstaller builds, Windows portable ZIP, user-level install/remove
+scripts, Apple Silicon app/ZIP/DMG scripts, bundled notices, reproducible version
+constraints, rotating logs and frozen-startup diagnostics. The build excludes
+unused Qt PDF/VirtualKeyboard/QML modules and unrelated host-native DLL paths.
+
+Validation: **61 pytest tests passed**, lint passed, and the actual Windows
+windowed executable passed `scripts/smoke_bundle.py` outside the checkout with
+PYTHONPATH/PYTHONHOME cleared. Report: frozen=true, Qt 6.12.0 dialog passed,
+mutual-TLS transfer complete, SHA-256 content match. Portable ZIP built locally
+(approximately 42 MB). The first frozen run exposed an incompatible ICU DLL
+from an unrelated host tool; sanitized build PATH fixed it before this commit.
+
+Limitations: Windows portable bundle verified on this development host, not a
+clean Windows VM. User-level installation is provided but not installed into the
+developer's account. Mac build and DMG are pending CI or physical arm64 execution.
+No publisher signing or notarization is claimed. Next: GitHub Actions and inspect
+the actual run results.

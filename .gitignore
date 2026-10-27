@@ -17,5 +17,6 @@ trust.json
 ipc.json
 replay.json
 instance.lock
+*.log
 *.part
 artifacts/
