@@ -33,3 +33,20 @@ length issue before this commit.
 Limitations: pairing UI/protocol and secure single-instance forwarding are
 scheduled for M4/M3. Real two-computer discovery and Mac UI remain unverified.
 Next: native integrations and single-instance IPC.
+
+## M3 — Native integration and single instance
+
+Added current-user IPC lock, random token, bounded local-socket/named-pipe
+messages and argument forwarding. Added Windows Send To shortcut, generated
+Finder Quick Action, install/removal UI and CLI, and opt-in login startup.
+Files: `ipc/instance.py`, `platform/integration.py`, app entry point/settings,
+installation guide and native integration tests.
+
+Validation: **18 tests passed**. An independent Python process forwarded paths
+with spaces and Chinese characters through the real IPC endpoint, and lock
+reacquisition after shutdown passed. Windows COM created a real `.lnk` in a test
+directory. Finder workflow plist and shell quoting were validated structurally.
+
+Limitations: Finder execution, login startup and actual Explorer/Finder user
+interaction still need manual verification; no claim of Mac execution is made.
+Next: session-verified pairing, revocation and adversarial reliability coverage.

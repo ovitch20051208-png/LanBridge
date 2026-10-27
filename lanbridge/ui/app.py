@@ -8,6 +8,7 @@ from PySide6.QtCore import Qt, QTimer, QUrl
 from PySide6.QtGui import QAction, QColor, QDesktopServices, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
+    QCheckBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
@@ -363,6 +364,33 @@ class MainWindow(QMainWindow):
             item.setData(Qt.ItemDataRole.UserRole, peer_id)
             trusted.addItem(item)
         layout.addRow("Trusted devices", trusted)
+        login = QCheckBox("Launch LanBridge in the background when I sign in")
+        login.setChecked(self.settings.launch_at_login)
+        layout.addRow(login)
+        native_row = QHBoxLayout()
+        install_button = QPushButton("Install file-manager action")
+        remove_button = QPushButton("Remove action")
+        native_row.addWidget(install_button)
+        native_row.addWidget(remove_button)
+        layout.addRow(native_row)
+
+        def native_action(install: bool):
+            from lanbridge.platform import integration
+
+            try:
+                if install:
+                    path = integration.install()
+                    QMessageBox.information(dialog, "File-manager integration", f"Installed: {path}")
+                else:
+                    integration.uninstall()
+                    QMessageBox.information(
+                        dialog, "File-manager integration", "Removed the LanBridge file-manager action."
+                    )
+            except (OSError, ValueError) as exc:
+                QMessageBox.warning(dialog, "Integration failed", str(exc))
+
+        install_button.clicked.connect(lambda: native_action(True))
+        remove_button.clicked.connect(lambda: native_action(False))
         layout.addRow("Version", QLabel(__version__))
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
@@ -371,6 +399,11 @@ class MainWindow(QMainWindow):
 
         def save():
             try:
+                from lanbridge.platform.integration import set_launch_at_login
+
+                if login.isChecked() != self.settings.launch_at_login:
+                    set_launch_at_login(login.isChecked())
+                    self.settings.launch_at_login = login.isChecked()
                 self.settings.name = clean_device_name(name.text())
                 self.settings.downloads = Path(downloads.text()).expanduser().absolute()
                 self.settings.save()
