@@ -43,7 +43,13 @@ def parse_peer(info: ServiceInfo) -> Peer:
     pair_port = int(props.get("pair_port", "0"))
     if not 0 <= pair_port <= 65535:
         raise ValueError("Invalid pairing port")
-    host = str(ipaddress.IPv4Address(addresses[0]))
+    # Windows often advertises APIPA addresses for disconnected/virtual adapters
+    # before its usable LAN address. DNS record ordering is not a route preference.
+    candidates = [ipaddress.IPv4Address(address) for address in addresses]
+    usable = [address for address in candidates if not (address.is_unspecified or address.is_multicast)]
+    if not usable:
+        raise ValueError("Missing usable peer address")
+    host = str(min(usable, key=lambda address: (address.is_link_local, int(address))))
     return Peer(
         props["id"],
         clean_device_name(props["name"]),

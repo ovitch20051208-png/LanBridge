@@ -154,6 +154,11 @@ class NetworkWorker:
                     expected_id,
                 )
                 self._paired(peer)
+            except TimeoutError:
+                self.events.error.emit(
+                    f"Could not pair: timed out connecting to {host}:{port} or waiting for confirmation. "
+                    "Check the other computer's LAN address, firewall and Allow pairing, then try again."
+                )
             except Exception as exc:
                 self.events.error.emit(f"Could not pair: {exc}")
 

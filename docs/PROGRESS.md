@@ -249,3 +249,10 @@ displayed an empty `Could not pair:` message. Strict bundle signature validation
 also found dangling QtSvg symlinks left by binary-only module filtering. These
 are observed issues to repair next, not successful pairing/Finder transfer gates.
 No physical two-computer file transfer has completed at this checkpoint.
+
+M7 discovery correction: prefer non-link-local advertised IPv4 addresses over
+APIPA addresses regardless of DNS order, while retaining link-local-only peers.
+The actual Windows LAN endpoint was reachable on both advertised ports. Added
+regression coverage for adapter ordering and a useful pairing timeout message;
+`scripts/check.py` passed: **64 passed, 1 skipped**, documentation/lint/format
+passed. Physical pairing will be retried with the rebuilt native application.

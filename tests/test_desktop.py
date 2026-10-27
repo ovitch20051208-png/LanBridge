@@ -34,6 +34,58 @@ def test_discovery_metadata():
         parse_peer(info)
 
 
+@pytest.mark.parametrize("lan_first", [False, True])
+def test_discovery_prefers_lan_over_disconnected_windows_adapters(lan_first):
+    addresses = ["169.254.235.126", "169.254.27.106", "10.137.199.4", "169.254.68.168"]
+    if lan_first:
+        addresses.reverse()
+    info = ServiceInfo(
+        SERVICE,
+        "multiple-adapters." + SERVICE,
+        addresses=[socket.inet_aton(address) for address in addresses],
+        port=47384,
+        properties={"v": "1", "id": "a" * 64, "name": "Windows", "pair_port": "1234"},
+    )
+    assert parse_peer(info).host == "10.137.199.4"
+
+
+def test_discovery_retains_link_local_only_peer():
+    info = ServiceInfo(
+        SERVICE,
+        "link-local." + SERVICE,
+        addresses=[socket.inet_aton("169.254.1.2")],
+        port=47384,
+        properties={"v": "1", "id": "a" * 64, "name": "Direct cable"},
+    )
+    assert parse_peer(info).host == "169.254.1.2"
+
+
+async def test_pairing_timeout_has_actionable_error(qapp, tmp_path, monkeypatch):
+    async def timeout(*args, **kwargs):
+        raise TimeoutError()
+
+    monkeypatch.setattr("lanbridge.ui.worker.pair", timeout)
+    events = Events()
+    errors = []
+    events.error.connect(errors.append)
+    worker = NetworkWorker(Settings.load(tmp_path / "timeout"), events, port=0, discovery=False)
+    worker.start()
+    try:
+        for _ in range(300):
+            qapp.processEvents()
+            if worker.pairing:
+                break
+            await asyncio.sleep(0.01)
+        pairing = worker.pair_address("192.0.2.1", 1234)
+        await asyncio.wrap_future(pairing)
+        qapp.processEvents()
+        assert len(errors) == 1
+        assert "timed out" in errors[0] and "192.0.2.1:1234" in errors[0]
+        assert "Allow pairing" in errors[0]
+    finally:
+        worker.stop()
+
+
 def test_accept_decline_dialog(qapp):
     for accept in (True, False):
         future = concurrent.futures.Future()
