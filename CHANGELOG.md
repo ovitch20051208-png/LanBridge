@@ -1,5 +1,16 @@
 # Changelog
 
+## M7 — Mac validation updates
+
+- Prefer a usable LAN address over disconnected adapters' link-local addresses;
+  display an actionable pairing timeout message.
+- Remove dangling Qt framework links from Mac bundles and validate strict ad-hoc
+  signature integrity before archiving.
+- Make secondary buttons visibly clickable and show standalone modal prompts
+  that also work while the main window is hidden.
+- Default new installations to Desktop/LanBridge Received; keep saved paths and
+  support creating a destination by entering its path and saving in Settings.
+
 ## Documentation update
 
 - Added top-of-page English / Simplified Chinese navigation and equivalent user-facing READMEs.

@@ -16,6 +16,6 @@ Do not rewrite published history; use `git revert <commit>` for shared rollback.
 6. **GitHub/CI**: private repository, Windows/macOS tests/builds/artifacts,
    reproducible manual acceptance and release notes.
 
-Release gate: a real Finder → Windows Accept → Downloads transfer and the reverse,
+Release gate: a real Finder → Windows Accept → configured receive folder transfer and the reverse,
 including decline/cancel/offline cases. Automated tests and CI do not replace this gate.
 See `docs/PROGRESS.md` for actual evidence and outstanding verification.

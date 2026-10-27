@@ -47,9 +47,9 @@ Python，也不用执行源码开发命令。
 | Windows 11，x86-64 | `LanBridge-windows-x86_64-0.1.0.zip` | 完整解压，打开 `LanBridge/LanBridge.exe`。不要删掉旁边的 `_internal`，也不要只移动 exe。 |
 | Apple Silicon Mac，包括 M3 | `LanBridge-macos-arm64-0.1.0.dmg` | 打开 DMG，把 `LanBridge.app` 复制到“应用程序”后再启动；也提供 arm64 应用 ZIP。 |
 
-目前通过**私有 GitHub 仓库的 Actions 构建产物**提供程序，尚未发布签名版 Release：
+目前通过**公开 GitHub 仓库的 Actions 构建产物**提供程序，尚未发布签名版 Release：
 
-1. 使用有仓库访问权限的账号，打开 [LanBridge CI](https://github.com/ovitch20051208-png/LanBridge/actions/workflows/ci.yml)。
+1. 登录 GitHub 后，打开 [LanBridge CI](https://github.com/ovitch20051208-png/LanBridge/actions/workflows/ci.yml)。
 2. 进入 `main` 分支一次成功的运行记录，找到页面下方的 **Artifacts**。
 3. Windows 选择 `LanBridge-windows-2025-unsigned`；Mac 选择 `LanBridge-macos-15-unsigned`。
 4. GitHub 会先下载一层“构建产物 ZIP”。解压后才能看到上表中的程序包；
@@ -94,7 +94,7 @@ Artifacts 保留 14 天；过期后，仓库所有者可以通过 **Run workflow
 接收方检查发送者、文件列表、总大小和 **Save to（保存到）**，然后点击 **Accept** 或 **Decline**。
 不需要再选择文件，也不需要每次重新选择保存目录。主窗口关闭后，只要仍在托盘/菜单栏运行，
 依然可以弹出确认窗口。
-默认保存到系统 Downloads（下载）目录；图中的路径只是隔离演示目录。
+新用户默认保存到**桌面/LanBridge Received**。在 **Settings… → Save received files to → Browse… → Save** 可自选目录，也可输入新文件夹路径，Save 会创建它。已有用户保存过的路径继续使用；图中的 Windows 路径只是隔离演示目录。
 
 接受后两边会显示进度。请等待状态变成 **complete**；100% 本身不代表最终完成。
 文件自动保存，发送方收到接收方校验完成的回执后才会报告成功。

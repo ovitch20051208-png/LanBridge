@@ -49,10 +49,10 @@ ordinary users do not need Python or source-development commands.
 | Windows 11, x86-64 | `LanBridge-windows-x86_64-0.1.0.zip` | Extract the whole ZIP; open `LanBridge/LanBridge.exe`. Keep `_internal` beside the executable. |
 | Apple Silicon Mac, including M3 | `LanBridge-macos-arm64-0.1.0.dmg` | Open the DMG, copy `LanBridge.app` into Applications, then open the copied app. An arm64 app ZIP is also available. |
 
-Packages are currently **private GitHub Actions artifacts**, not a signed Release:
+Packages are currently **GitHub Actions artifacts from the public repository**, not a signed Release:
 
 1. Open [LanBridge CI](https://github.com/ovitch20051208-png/LanBridge/actions/workflows/ci.yml)
-   while signed in with repository access.
+   while signed in to GitHub.
 2. Open a successful run on `main`; scroll to **Artifacts**.
 3. Download `LanBridge-windows-2025-unsigned` or `LanBridge-macos-15-unsigned`.
 4. Extract GitHub's outer artifact ZIP to obtain the actual package listed above.
@@ -98,7 +98,7 @@ device says **Paired**. For an empty list, see [connection troubleshooting](docs
 Review the sender, file list, total size and **Save to** location. Click **Accept**
 or **Decline**. The receiver does not need to choose files or a new destination
 for every request. The dialog can appear while its main window is hidden.
-The default is the OS Downloads directory; the pictured path is an isolated demo folder.
+New installations receive into **Desktop/LanBridge Received**. Use **Settings… → Save received files to → Browse… → Save** to choose another folder or enter a new folder path; Save creates it. Existing saved destinations stay in use. The pictured Windows path is an isolated demo folder.
 
 Both computers show progress. Wait for **complete**: 100% bytes sent is not the
 final result. Files are saved automatically, and the sender reports completion

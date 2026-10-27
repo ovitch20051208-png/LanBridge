@@ -425,7 +425,11 @@ class MainWindow(QMainWindow):
         self.activateWindow()
 
     def open_downloads(self):
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.settings.downloads)))
+        try:
+            self.settings.downloads.mkdir(parents=True, exist_ok=True)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.settings.downloads)))
+        except OSError as exc:
+            self.show_error(f"Could not open received files: {exc}")
 
     def show_settings(self):
         dialog = QDialog(self)
@@ -446,6 +450,11 @@ class MainWindow(QMainWindow):
         )
         directory_row.addWidget(browse)
         layout.addRow("Save received files to", directory_row)
+        directory_hint = QLabel(
+            "Choose a folder with Browse…, or enter a new folder path.\nSave creates the folder if needed."
+        )
+        directory_hint.setWordWrap(True)
+        layout.addRow("", directory_hint)
         identity = QLineEdit(self.worker.identity.id)
         identity.setReadOnly(True)
         layout.addRow("Device fingerprint", identity)

@@ -12,6 +12,10 @@ Start with `python -m lanbridge`. Use `--data-dir <absolute-directory> --port 0`
 for an isolated second test instance. Logs go to the launching console;
 `--verbose` enables diagnostic logging.
 
+## Receive folder
+
+New installations default to `Desktop/LanBridge Received`, using the OS desktop location on both platforms. Existing saved destinations are preserved. In Settings, use **Save received files to → Browse…** to select/create a folder, or type a new folder path and click **Save**. The folder is also created on the first accepted transfer or when opening **Received Files**. Each computer controls its own receive destination.
+
 ## Native actions (explicit opt-in)
 
 In Settings choose **Install file-manager action**, or run:

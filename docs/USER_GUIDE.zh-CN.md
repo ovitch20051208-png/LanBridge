@@ -15,7 +15,7 @@
 | [发送文件](#send-files) | 单文件、多选、选择接收设备 |
 | [接收文件](#receive-files) | Accept、Decline、超时和后台弹窗 |
 | [进度与取消](#progress-and-cancel) | 速度、剩余字节、任务选择和取消 |
-| [文件保存](#saved-files) | 下载目录、同名文件和中断文件 |
+| [文件保存](#saved-files) | 接收目录、同名文件和中断文件 |
 | [设置](#settings) | 名称、目录、信任、登录启动、集成按钮 |
 | [文件管理器入口](#file-manager) | Windows / Mac 右键发送 |
 | [后台运行](#background) | 关窗口与 Quit 的区别 |
@@ -116,7 +116,7 @@
 - 点击 **Decline** 或关闭请求弹窗表示拒绝；不应传文件内容或留下未完成文件。
 - 一直不处理，请求会在 90 秒确认期限后结束。
 
-**图中是演示目录；默认保存到系统 Downloads（下载）目录，也可以在设置中修改。**
+**图中是演示目录；新用户默认保存到桌面/LanBridge Received，已有保存路径继续生效，也可以在设置中修改。**
 
 ![declined 拒收状态，已传大小为 0](images/user-guide/12-transfer-declined.jpg)
 
@@ -152,8 +152,9 @@
 
 ## 7. 找文件与处理重名
 
-默认接收到系统 **Downloads（下载）**。修改方式：
+新用户默认接收到**桌面/LanBridge Received**；已有用户保存过的路径（包括 Downloads）继续生效。修改方式：
 **Settings… → Save received files to → Browse… → 选择可写目录 → Save**。
+在系统目录选择框可新建文件夹；也可直接在设置中输入新文件夹的完整路径，再点 **Save** 创建。两台电脑分别设置自己的接收目录；发送时选文件不会改变接收目录。
 
 通过托盘 / 菜单栏的 **Received Files** 可以直接打开接收目录；它只打开目录，不执行收到的文件。
 已有 `report.pdf` 时，新文件会保存成 `report (1).pdf`、`report (2).pdf`；

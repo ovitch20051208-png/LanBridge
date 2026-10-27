@@ -4,7 +4,7 @@ import socket
 from dataclasses import dataclass
 from pathlib import Path
 
-from platformdirs import user_config_path, user_downloads_path
+from platformdirs import user_config_path, user_desktop_path
 
 from lanbridge.core.storage import private_directory, read_json, write_json
 
@@ -32,12 +32,16 @@ class Settings:
         return cls(
             directory,
             clean_device_name(data.get("name", socket.gethostname()[:60])),
-            Path(data.get("downloads", str(user_downloads_path()))).expanduser().absolute(),
+            Path(data.get("downloads", str(user_desktop_path() / "LanBridge Received")))
+            .expanduser()
+            .absolute(),
             bool(data.get("launch_at_login", False)),
         )
 
     def save(self):
         self.name = clean_device_name(self.name)
+        self.downloads = self.downloads.expanduser().absolute()
+        self.downloads.mkdir(parents=True, exist_ok=True)
         write_json(
             self.directory / "settings.json",
             {"name": self.name, "downloads": str(self.downloads), "launch_at_login": self.launch_at_login},

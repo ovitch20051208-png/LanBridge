@@ -25,7 +25,7 @@ Use a Windows 11 x86-64 machine and a real Apple Silicon Mac. No browser is used
 4. Without manually opening Windows LanBridge, confirm a foreground dialog shows
    sender, the complete file list, total size and Accept/Decline.
 5. Click **Accept**. Confirm progress and speed on both systems. Check files in
-   the configured Downloads location and compare SHA-256 values.
+   the configured receive folder (new installations: Desktop/LanBridge Received) and compare SHA-256 values.
 6. Verify both computers show completion only after validation. No website,
    cloud upload, manual IP, or receiver-side file selection should be involved.
 

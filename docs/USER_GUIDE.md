@@ -17,7 +17,7 @@ current English interface exactly.
 | [Send files](#send-files) | Single/multiple selection and recipient choice |
 | [Receive files](#receive-files) | Accept, Decline and request timeout |
 | [Progress / cancel](#progress-and-cancel) | Speed, remaining bytes, history and cancellation |
-| [Saved files](#saved-files) | Downloads, collisions and incomplete files |
+| [Saved files](#saved-files) | Receive folder, collisions and incomplete files |
 | [Settings](#settings) | Name, folder, trust, startup and integration buttons |
 | [Explorer / Finder](#file-manager) | Install, use and remove native actions |
 | [Background operation](#background) | Close versus Quit; tray/menu-bar actions |
@@ -155,7 +155,7 @@ The **Incoming files** dialog contains:
 
 Click **Accept** to begin. Files then save automatically; you do not browse for
 the sender's files or choose a destination on every request. The pictured folder
-is a demo folder; the normal default is the OS Downloads directory.
+is a demo folder. New installations default to **Desktop/LanBridge Received**; existing saved paths stay in use.
 
 Click **Decline**, or close the request dialog, to refuse. No file content should
 be sent and no partial destination file should be left. Ignoring the request
@@ -204,8 +204,7 @@ sent/received database and is not restored as a full history after restarting.
 
 ## 7. Find files and understand duplicate names
 
-The receiver's default destination is its OS **Downloads** directory. Change it
-with **Settings… → Save received files to → Browse… → Save**.
+New installations receive into **Desktop/LanBridge Received**. Existing saved destinations, including Downloads, stay in use. Change the folder with **Settings… → Save received files to → Browse… → Save**. In the folder picker you can create a folder, or enter a new absolute path in the settings field and click **Save** to create it. Both computers set their own receive folder; choosing a send file does not change it.
 
 To open it, use the tray/menu-bar menu's **Received Files**. This opens the
 directory in the system file manager; it does not execute a received file.

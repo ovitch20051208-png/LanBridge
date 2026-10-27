@@ -282,3 +282,12 @@ main window. Consent and pairing still require explicit decisions. Strengthened
 the hidden-recipient integration check to verify dialog exposure while the main
 window stays unexposed. Full offscreen gate: **64 passed, 1 skipped**; the complete
 desktop test module also passed with the native Cocoa plugin (**12 passed**).
+
+M7 destination update requested by the tester: new installations now default to
+the OS Desktop's `LanBridge Received` folder on both platforms. Saved destinations
+remain unchanged. Settings Save creates a newly entered destination; Received
+Files creates the configured folder before opening it. Added settings guidance
+and matching English/Chinese documentation. Isolated regression tests verify the
+new-user default, folder creation, custom-path persistence and preservation of
+an existing Downloads setting. Full gate: **66 passed, 1 skipped**; native Cocoa
+desktop tests: **14 passed**. This is not a clean-system installation result.

@@ -131,6 +131,34 @@ def test_human_sizes():
     assert human_size(1024) == "1.0 KiB"
 
 
+def test_default_receive_folder_and_custom_path_persistence(tmp_path, monkeypatch):
+    desktop = tmp_path / "Desktop"
+    monkeypatch.setattr("lanbridge.core.config.user_desktop_path", lambda: desktop)
+    state = tmp_path / "new-user"
+    settings = Settings.load(state)
+    assert settings.downloads == desktop / "LanBridge Received"
+    assert not settings.downloads.exists()
+    settings.save()
+    assert settings.downloads.is_dir()
+    custom = tmp_path / "自定义 folder" / "received"
+    settings.downloads = custom
+    settings.save()
+    assert custom.is_dir()
+    assert Settings.load(state).downloads == custom
+
+
+def test_existing_downloads_setting_is_preserved(tmp_path, monkeypatch):
+    from lanbridge.core.storage import write_json
+
+    monkeypatch.setattr("lanbridge.core.config.user_desktop_path", lambda: tmp_path / "Desktop")
+    state = tmp_path / "existing-user"
+    state.mkdir()
+    previous = tmp_path / "Downloads"
+    write_json(state / "settings.json", {"downloads": str(previous)})
+    assert Settings.load(state).downloads == previous
+    assert not (tmp_path / "Desktop").exists()
+
+
 def test_progress_selects_correct_transfer_for_cancel(qapp, tmp_path):
     from lanbridge.network.transfer import Progress
 
