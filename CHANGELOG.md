@@ -1,5 +1,13 @@
 # Changelog
 
+## Documentation update
+
+- Added top-of-page English / Simplified Chinese navigation and equivalent user-facing READMEs.
+- Added full bilingual illustrated guides covering every current control, first transfer,
+  pairing, acceptance, progress, settings, native actions, background mode and manual fallback.
+- Added 11 real Windows screenshots with demo provenance and documentation link / image checks.
+- Clarified artifact downloads, session-only task history and remaining physical acceptance gates.
+
 ## 0.1.0 — development preview
 
 - Local desktop send/receive with explicit Accept/Decline, background Qt receiver

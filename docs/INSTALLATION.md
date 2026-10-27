@@ -1,5 +1,9 @@
 # Installation and file-manager integration
 
+For button-by-button operation and screenshots, see the [English user guide](USER_GUIDE.md)
+or [中文图文操作指南](USER_GUIDE.zh-CN.md). Packaged-app users can start with those
+guides; the source commands below are for developers.
+
 ## Source development
 
 Use Python 3.12+ and a virtual environment, then `python -m pip install -e ".[dev]"`.

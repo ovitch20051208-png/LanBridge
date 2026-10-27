@@ -174,3 +174,30 @@ clean-machine install/login-startup checks, publisher signing/notarization and
 dependency license review before calling this a production release. V1.0 resume,
 folders and auto-accept remain intentionally absent. These limits are not
 presented as completed acceptance tests.
+
+## Bilingual documentation milestone — 2026-10-27
+
+Replaced the short developer-first README with a user-first English README and
+equivalent `README.zh-CN.md`. Both place English / Simplified Chinese navigation
+at the top and link to complete, illustrated guides in `docs/USER_GUIDE*.md`.
+The guides cover every current main-window, incoming-dialog, settings and tray
+control, plus installation, first pairing, file-manager actions, manual endpoints,
+cancellation, saved files and troubleshooting.
+
+Added 11 actual Windows captures from isolated loopback fixtures, with provenance
+in `docs/images/user-guide/README.md`. The accepted documentation transfer used
+real pairing, mutual TLS and three files; received SHA-256 digests matched.
+Pictures show the real English interface and do not claim Mac UI or physical
+cross-platform acceptance. No production user profile or host LAN address was used.
+
+Validation: `scripts/check.py` passed the documentation gate (13 Markdown files,
+144 local links and 11 images), lint, formatting and **61 automated tests**.
+The new `scripts/check_docs.py` is part of the normal gate, so missing translated
+links, section anchors or image assets fail future checks. GitHub's GFM renderer
+also rendered all four English/Chinese README/guide documents successfully for
+an offline preview with embedded screenshots. Local-file browser automation is
+blocked by the browser URL policy; the preview is delivered for the user to open.
+
+Application behavior and desktop binaries are unchanged by this documentation
+milestone. Native file-manager and physical Mac ↔ Windows acceptance remain the
+next user testing steps described in the guide and manual acceptance checklist.

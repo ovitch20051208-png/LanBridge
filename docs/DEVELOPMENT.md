@@ -19,6 +19,11 @@ interactive diagnostics. Live multicast smoke is separate because hosted runners
 and some networks block multicast. All transfer integration tests use real
 loopback sockets, separate identities and receiver decisions.
 
+The gate also runs `scripts/check_docs.py`: local README/guide links, translated
+navigation, section anchors and referenced image assets must resolve. When updating
+the English UI guide, update its Chinese counterpart and retain matching button
+names. Screenshot provenance is recorded in `docs/images/user-guide/README.md`.
+
 For two visible desktop instances:
 
 ```
