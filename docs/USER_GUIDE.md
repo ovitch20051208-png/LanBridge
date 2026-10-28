@@ -299,6 +299,12 @@ On the tested M3/macOS 15.7, **Send with LanBridge** appeared directly in the Fi
 
 ## 10. Keep receiving in the background
 
+To return to the existing window, use **Open LanBridge** in its tray/menu bar,
+or open the installed application again. Mac uses Applications/LanBridge.app;
+Windows uses the extracted LanBridge.exe or its shortcut. This keeps one running
+instance and preserves the previous selection. A source folder named LanBridge
+is a project folder, not the installed application.
+
 Closing the main window normally hides it while the app remains in the Windows
 system tray / macOS menu bar. Keep both peers awake and connected to receive.
 On a desktop with no tray support, closing the window can quit instead.

@@ -372,3 +372,23 @@ Native screenshot QA found the expanded settings form could compress its wrapped
 directory hint. Widened the form and reserved font-scaled hint height. The full
 gate after this layout adjustment remained **74 passed, 1 skipped**; rebuilt
 visual verification is recorded next rather than inferred from the tests.
+
+## M7 continuation — application reopening — 2026-10-28
+
+The installed `6bccb65` Mac app was still running and listening after the night,
+but double-clicking its actual Applications icon did not restore the hidden
+window. Finder's selected Desktop item named LanBridge was separately confirmed
+to be the source folder, not the application.
+
+Added an explicit native macOS reopen AppleEvent handler, using OS frameworks
+and the standard library, so a user opening the app raises its existing window.
+It handles only reopen events, preserving background startup, incoming dialogs
+and file-manager direct-send behavior. The same shared open-request handler now
+handles a second Windows EXE launch and preserves previous file selection on
+both platforms without sending those files. The user requested cross-platform
+feature parity and publishing each completed module separately.
+
+Module checks: full gate **76 passed, 1 skipped**; native Cocoa reopening,
+file-manager and desktop modules **23 passed**. The native handler callback and
+cleanup were exercised on this Mac; frozen Finder double-click verification
+follows after rebuilding rather than being inferred from these checks.

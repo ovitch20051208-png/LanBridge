@@ -70,6 +70,11 @@ def main() -> int:
     app.aboutToQuit.connect(instance.close)
     worker = NetworkWorker(settings, events, port=args.port, discovery=not args.no_discovery)
     window = MainWindow(settings, worker, events)
+    if sys.platform == "darwin":
+        from lanbridge.platform.macos_events import MacReopenHandler
+
+        reopen_handler = MacReopenHandler(lambda: events.forwarded.emit([]))
+        app.aboutToQuit.connect(reopen_handler.close)
     app.aboutToQuit.connect(worker.stop)
     worker.start()
     if args.files:

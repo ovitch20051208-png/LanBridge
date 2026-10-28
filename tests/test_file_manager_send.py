@@ -121,6 +121,19 @@ def test_empty_file_action_never_sends_previous_selection(qapp, tmp_path, monkey
         dispose(window)
 
 
+def test_reopening_existing_app_preserves_selection_and_does_not_send(qapp, tmp_path, monkeypatch):
+    window, worker, calls = make_window(qapp, tmp_path, monkeypatch)
+    paths = [tmp_path / "previous selection.txt"]
+    try:
+        window.set_files(paths)
+        window.hide()
+        worker.events.forwarded.emit([])
+        assert window.isVisible() and window.paths == paths
+        assert not calls
+    finally:
+        dispose(window)
+
+
 def test_install_status_refreshes_and_reinstall_updates_same_action(qapp, tmp_path, monkeypatch):
     from lanbridge.platform import integration
 

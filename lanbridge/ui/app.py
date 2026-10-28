@@ -239,7 +239,7 @@ class MainWindow(QMainWindow):
         events.info.connect(self.status.setText)
         events.received.connect(self.received)
         events.ready.connect(self._ready)
-        events.forwarded.connect(self.set_files)
+        events.forwarded.connect(self.open_request)
         events.send_requested.connect(self.send_from_file_manager)
         events.pairing.connect(self.pairing_prompt)
         events.paired.connect(self.paired)
@@ -286,6 +286,14 @@ class MainWindow(QMainWindow):
             )
         self._selection()
         if reveal:
+            self.reveal()
+
+    def open_request(self, paths):
+        if paths:
+            self.set_files(paths)
+        else:
+            # A second EXE launch on Windows and a reopen AppleEvent on Mac
+            # both raise the existing window without clearing its selection.
             self.reveal()
 
     def _ready(self, port):
