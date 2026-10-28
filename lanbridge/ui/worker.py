@@ -113,10 +113,12 @@ class NetworkWorker:
             task = asyncio.current_task()
             cancel = Cancellation()
             current_id = None
+            last_state = ""
 
             def progress(value):
-                nonlocal current_id
+                nonlocal current_id, last_state
                 current_id = value.id
+                last_state = value.state
                 self.sends[value.id] = (task, cancel)
                 self.send_peers[value.id] = peer.id
                 self.events.progress.emit(value)
@@ -126,9 +128,13 @@ class NetworkWorker:
                     self.identity, self.trust, peer.id, peer.host, peer.port, paths, progress, cancel
                 )
             except (asyncio.CancelledError, TransferCancelled):
-                self.events.info.emit("Transfer cancelled")
+                if last_state != "cancelled":
+                    self.events.info.emit("Transfer cancelled")
             except Exception as exc:
-                self.events.error.emit(f"Could not send files: {exc}")
+                # The task's terminal progress is authoritative. A delayed generic
+                # error would overwrite Ready after the user archives that task.
+                if not last_state.startswith("error:"):
+                    self.events.error.emit(f"Could not send files: {exc}")
             finally:
                 if current_id:
                     self.sends.pop(current_id, None)

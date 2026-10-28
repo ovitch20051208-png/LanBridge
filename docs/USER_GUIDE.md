@@ -73,6 +73,7 @@ then try multiple files, a Unicode name, an empty file, and a larger file.
 | **Send files** | Click after choosing files and a paired recipient | Starts a request; no file content is sent before acceptance. |
 | **Transfer history** | Select a task | Chooses which task the progress area and Cancel button refer to. |
 | Progress bar / status | Watch bytes, speed, remaining size and state | A complete receipt matters more than a 100% bar. |
+| **Archive task** | Use after complete, failed, cancelled or declined | Closes the result and returns to Ready; the Archived entry remains in this session's Transfer history. |
 | **Cancel transfer** | Cancel the task currently selected in the dropdown | Available while that task is active. |
 | **Settings…** | Open settings | Configure name, destination, trusted devices and optional integrations. |
 
@@ -203,6 +204,13 @@ success. Interrupted transfers restart from the beginning; V1 has no resume.
 
 The dropdown is a recent **current-session** task view. It is not a persistent
 sent/received database and is not restored as a full history after restarting.
+
+Failed, cancelled and declined tasks show their terminal label instead of a
+stuck percentage. **Archive task** closes the current result and returns to
+Ready; select its **Archived** entry in Transfer history to review it again.
+Archiving keeps files and does not cancel a running task. These history entries
+are held for the current app session and are cleared when the app quits.
+
 
 <a id="saved-files"></a>
 

@@ -88,3 +88,7 @@ Wi-Fi interruption/recovery:
   after the tester disabled Windows Wi-Fi, never reporting complete.
 - `30-network-retry-complete.jpg`: same file fully retransmitted after Wi-Fi was
   restored, without restarting/re-pairing. Windows tester also confirmed receipt.
+
+- `31-empty-timeout-error.jpg`: unfixed clean `597e8a3`, after Windows sender
+  Wi-Fi interruption. Empty error reason and zeroed count were observed despite
+  83,214,336 actual staged bytes; automatic cleanup and file preservation passed.

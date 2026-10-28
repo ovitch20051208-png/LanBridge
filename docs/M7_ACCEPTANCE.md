@@ -163,6 +163,19 @@ The original Mac app process is PID 51515.
   restart-cleanup tests passed. They use separate identities/directories and do
   not stand in for these two-computer observations.
 
+**Reverse-role first attempt:** Windows sent the verified same file to the
+hidden Mac (`76cf46fe…`). Mac accepted, and filesystem observation confirmed
+83,214,336 staged payload bytes before the tester disabled Windows Wi-Fi. The
+receiver timed out, removed its staging automatically and preserved the exact
+pre-test files; no final network-test file appeared. Windows reported its send
+error as the network name no longer available. Native Mac diagnostics had a
+real defect: the task displayed empty `error:` and reset the transferred count
+to zero. Screenshot 31 captures that old clean `597e8a3` behavior. Diagnostic
+correction `6735dee` passed **80 tests, 1 skipped**; frozen regression follows.
+The tester clarified that both prior Wi-Fi toggles were on Windows, not Mac.
+
+![Observed empty timeout reason before the fix](images/mac-m7/31-empty-timeout-error.jpg)
+
 The large source's streaming SHA-256 was verified before the test:
 `8479e43911dc45e89f934fe48d01297e16f51d17aa561d4d1c216b1ae0fcddca`.
 

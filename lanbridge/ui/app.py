@@ -125,6 +125,7 @@ class MainWindow(QMainWindow):
         self.dialogs: list[QDialog] = []
         self.active_id = None
         self.transfers = {}
+        self.archived_transfers: set[str] = set()
         self.receiver_ready = False
         self.discovery_settled = not worker.enable_discovery
         self.file_manager_requests: list[list[Path]] = []
@@ -211,6 +212,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.transfer_selector)
         self.progress = QProgressBar()
         self.progress.setValue(0)
+        self.progress.hide()
         layout.addWidget(self.progress)
         self.status = QLabel("Starting receiver…")
         self.status.setWordWrap(True)
@@ -221,6 +223,11 @@ class MainWindow(QMainWindow):
         self.cancel_button.setEnabled(False)
         self.cancel_button.clicked.connect(lambda: self.worker.cancel(self.active_id))
         row.addWidget(self.cancel_button)
+        self.archive_button = QPushButton("Archive task")
+        self.archive_button.setToolTip("Close this finished result; keep it in Transfer history.")
+        self.archive_button.setEnabled(False)
+        self.archive_button.clicked.connect(self._archive_transfer)
+        row.addWidget(self.archive_button)
         row.addStretch()
         settings_button = QPushButton("Settings…")
         settings_button.clicked.connect(self.show_settings)
@@ -337,7 +344,8 @@ class MainWindow(QMainWindow):
 
     def _ready(self, port):
         self.receiver_ready = True
-        self.status.setText(f"Ready to receive · port {port}")
+        if self.transfer_selector.currentData() is None:
+            self._show_transfer()
         self._drain_file_manager_requests()
 
     def _settle_discovery(self):
@@ -512,10 +520,14 @@ class MainWindow(QMainWindow):
             index = self.transfer_selector.count() - 1
             self.transfer_selector.setCurrentIndex(index)
         self.transfer_selector.setItemText(
-            index, f"{value.direction.capitalize()} {value.id[:8]} · {value.state}"
+            index,
+            ("Archived · " if value.id in self.archived_transfers else "")
+            + f"{value.direction.capitalize()} {value.id[:8]} · {value.state}",
         )
         if self.transfer_selector.currentData() == value.id:
             self._show_transfer()
+        if value.state.startswith("error:") and (not previous or not previous.state.startswith("error:")):
+            self.tray.showMessage("LanBridge", value.state[7:], QSystemTrayIcon.MessageIcon.Warning)
         if (
             value.direction == "send"
             and value.state == "complete"
@@ -524,18 +536,55 @@ class MainWindow(QMainWindow):
             self.tray.showMessage("LanBridge", "Files sent and verified by the receiver.")
         if len(self.transfers) > 50:
             for request_id, progress in list(self.transfers.items()):
-                if request_id != self.active_id and progress.state in {"complete", "declined", "cancelled"}:
+                if request_id != self.active_id and (
+                    progress.state in {"complete", "declined", "cancelled"}
+                    or progress.state.startswith("error:")
+                ):
                     self.transfers.pop(request_id)
+                    self.archived_transfers.discard(request_id)
                     self.transfer_selector.removeItem(self.transfer_selector.findData(request_id))
                     break
+
+    def _archive_transfer(self):
+        value = self.transfers.get(self.transfer_selector.currentData())
+        if value is None or not (
+            value.state in {"complete", "declined", "cancelled"} or value.state.startswith("error:")
+        ):
+            return
+        self.archived_transfers.add(value.id)
+        self.transfer_selector.setItemText(
+            self.transfer_selector.currentIndex(),
+            f"Archived · {value.direction.capitalize()} {value.id[:8]} · {value.state}",
+        )
+        self.transfer_selector.setCurrentIndex(-1)
 
     def _show_transfer(self, *_):
         value = self.transfers.get(self.transfer_selector.currentData())
         if value is None:
+            self.active_id = None
+            self.cancel_button.setEnabled(False)
+            self.archive_button.setEnabled(False)
+            self.progress.setValue(0)
+            self.progress.hide()
+            self.status.setText(
+                f"Ready to receive · port {self.worker.port}" if self.receiver_ready else "Starting receiver…"
+            )
             return
         self.active_id = value.id
         terminal = value.state in {"complete", "declined", "cancelled"} or value.state.startswith("error:")
         self.cancel_button.setEnabled(not terminal)
+        self.archive_button.setEnabled(terminal)
+        self.progress.show()
+        if terminal and value.state != "complete":
+            label = "Failed" if value.state.startswith("error:") else value.state.capitalize()
+            self.progress.setValue(0)
+            self.progress.setFormat(label)
+            self.status.setText(
+                f"{value.direction.capitalize()} · {value.state}\n"
+                f"{human_size(value.done)} transferred · {human_size(value.total)} total · task ended"
+            )
+            return
+        self.progress.setFormat("%p%")
         percent = (
             int(value.done * 100 / value.total) if value.total else (100 if value.state == "complete" else 0)
         )

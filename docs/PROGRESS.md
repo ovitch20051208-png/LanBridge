@@ -517,3 +517,18 @@ and all TLS/pinning/consent checks stay in place. Full gate: **80 passed, 1 skip
 real paired-TLS regression verifies partial-byte accounting, nonempty timeout
 message and automatic staging removal; sender-side timeout propagation is also
 covered. The separately requested terminal progress/archiving UI follows next.
+
+## M7 refinement — terminal progress and task archiving — 2026-10-28
+
+Tester reported that a failed Windows send remained at 32%, appearing stalled.
+Shared desktop UI now renders Failed/Cancelled/Declined instead of an active
+percentage for unsuccessful terminal tasks. Actual transferred-byte details
+remain available. Archive task closes a finished result, hides/resets its bar,
+returns to Ready and marks the session-history entry Archived for later review.
+Running transfers cannot be archived. New transfers restore ordinary percentage
+progress. History remains session-local with its existing bounded retention.
+
+Prevented a delayed worker error/cancellation notification after asynchronous TLS
+cleanup from overwriting Ready after archive; terminal progress supplies the
+notification once. Full gate **83 passed, 1 skipped**, covering archival/review/
+new-task behavior and delayed failure/cancellation cleanup. Native Cocoa checks **28 passed**. Frozen native visual and Windows physical checks follow after clean build.
