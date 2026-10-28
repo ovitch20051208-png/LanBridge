@@ -211,6 +211,10 @@ Ready; select its **Archived** entry in Transfer history to review it again.
 Archiving keeps files and does not cancel a running task. These history entries
 are held for the current app session and are cleared when the app quits.
 
+![Real Mac: failed task shows its reason and an Archive task action](images/mac-m7/32-timeout-failed-fixed.jpg)
+
+![Archiving returns the app to Ready](images/mac-m7/33-task-archived-ready.jpg)
+
 
 <a id="saved-files"></a>
 

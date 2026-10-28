@@ -157,6 +157,10 @@
 点击 **Archive task（归档任务）** 收起当前结果并回到 Ready；从 Transfer history 选择 **Archived** 条目可再次查看。
 归档保留文件，也不会取消正在运行的任务。历史记录保留在本次应用运行中，退出应用后清空。
 
+![真实 Mac：失败任务显示原因并可归档](images/mac-m7/32-timeout-failed-fixed.jpg)
+
+![归档后回到 Ready，收起进度条](images/mac-m7/33-task-archived-ready.jpg)
+
 
 <a id="saved-files"></a>
 

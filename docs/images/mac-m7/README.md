@@ -92,3 +92,13 @@ Wi-Fi interruption/recovery:
 - `31-empty-timeout-error.jpg`: unfixed clean `597e8a3`, after Windows sender
   Wi-Fi interruption. Empty error reason and zeroed count were observed despite
   83,214,336 actual staged bytes; automatic cleanup and file preservation passed.
+
+Images 32–34 use clean `ec981af` for the corrected physical reverse Wi-Fi test:
+
+- `32-timeout-failed-fixed.jpg`: explicit timeout message, Failed bar label,
+  preserved 203.6 MiB count and available Archive task button.
+- `33-task-archived-ready.jpg`: after actual Archive task, Ready is restored and
+  the bar is hidden; running receive service stays available.
+- `34-archived-history-review.jpg`: operator selected the Archived failure from
+  the real history popup and reviewed the original error/byte details again.
+  Windows Failed/archive/Ready behavior was separately confirmed by the tester.

@@ -532,3 +532,16 @@ Prevented a delayed worker error/cancellation notification after asynchronous TL
 cleanup from overwriting Ready after archive; terminal progress supplies the
 notification once. Full gate **83 passed, 1 skipped**, covering archival/review/
 new-task behavior and delayed failure/cancellation cleanup. Native Cocoa checks **28 passed**. Frozen native visual and Windows physical checks follow after clean build.
+
+Clean `ec981af` arm64 app/ZIP/DMG passed strict deep signature and frozen
+Qt/TLS/hash diagnostics and was installed at Applications. Matching verified
+Windows ZIP was delivered (`1a25ac67…`, 40 MiB, complete) and tester updated it.
+In physical reverse Wi-Fi fault `fdabb934…`, Mac retained 213,450,752 received
+bytes and displayed the explicit timeout reason with Failed rather than an
+active percentage. Original files stayed unchanged; no final/staging file
+remained. Actual Archive task returned Ready and hid the bar. Native history
+popup retained the Archived item; reselect/review/rearchive also passed. Tester
+confirmed identical Windows Failed/Archive/Ready behavior. Native screenshots
+32–34 document this phase. `ec981af` CI 40769388025 passed all six jobs; both
+Python 3.12 logs show **83 passed, 1 platform-specific skip**. Full reverse retry
+`3c8838f5…` is the next separate check.

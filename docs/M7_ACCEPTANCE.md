@@ -65,6 +65,15 @@ verified and delivered for physical validation as `LanBridge-Windows-597e8a3.zip
 `1dab09ba17df272a01760c17d707016379fcb1e9784eac1de6573a06959e2cc9`,
 `source_dirty=false`, AMD64/Python 3.12.10/Qt 6.12.0.
 
+Timeout/terminal-history checkpoint: clean `ec981af` Mac bundle, native arm64
+Python 3.12.16/Qt 6.12.0, strict deep signature verification and frozen diagnostic
+passed. ZIP SHA-256 `46603f00ba50cbf21ddad3ec6f52fb21b458ef861e63a8f9662cfa9c161ed016`;
+DMG `2b00d61dea37ae5f93a9f7e3532feeaeab001a30ed0c23102d6a277beac38880`.
+The matching CI-built Windows ZIP delivered as `LanBridge-Windows-ec981af.zip`
+is 41,943,677 bytes, SHA-256
+`60e89984c3bd9ab3c58c96ced6e83e00c8f8b77c63592f63ed67947bf814052d`,
+clean AMD64/Python 3.12.10/Qt 6.12.0.
+
 ## Observed physical checks
 
 | Check | Evidence / scope |
@@ -176,6 +185,23 @@ The tester clarified that both prior Wi-Fi toggles were on Windows, not Mac.
 
 ![Observed empty timeout reason before the fix](images/mac-m7/31-empty-timeout-error.jpg)
 
+**Fixed reverse-role failure/archiving:** both apps updated to clean `ec981af`.
+Mac accepted `fdabb934…`, received 213,450,752 bytes (203.6 MiB), then Windows
+Wi-Fi was disabled again. Mac reported Connection timed out with those bytes
+preserved, displayed Failed instead of a percentage, removed all staging and
+preserved its exact original files. Operator clicked Archive task: bar hidden,
+Ready restored. The actual history popup retained the Archived record; operator
+reselected it, reviewed the same error/bytes and archived it again. Tester
+confirmed the same Failed/Archive/Ready/bar-hidden behavior on Windows. A new
+request `3c8838f5…` then restored ordinary percentage progress; its full retry
+verification is in progress. Mac process 52809 did not restart for these tests.
+
+![Fixed timeout reason and Failed state with actual received bytes](images/mac-m7/32-timeout-failed-fixed.jpg)
+
+![Archiving closes the result and returns to Ready](images/mac-m7/33-task-archived-ready.jpg)
+
+![Archived task remains reviewable in the current session](images/mac-m7/34-archived-history-review.jpg)
+
 The large source's streaming SHA-256 was verified before the test:
 `8479e43911dc45e89f934fe48d01297e16f51d17aa561d4d1c216b1ae0fcddca`.
 
@@ -196,8 +222,8 @@ The large source's streaming SHA-256 was verified before the test:
 
 ## Automated checks
 
-Latest full Mac gate after editable file selection: documentation, lint/format, **78 passed, 1 Windows COM test
-skipped**. Native Cocoa reopening/file-manager/desktop modules: **25 passed**.
+Latest full Mac gate after timeout/terminal-history corrections: documentation, lint/format, **83 passed, 1 Windows COM test
+skipped**. Native Cocoa reopening/file-manager/desktop/history modules: **28 passed**.
 The `c863854` CI completed all six jobs successfully, including both native
 builds and frozen diagnostics. Inspected Python 3.12 logs: Windows **76 passed,
 1 native macOS test skipped**; Mac **76 passed, 1 Windows COM test skipped**.
@@ -214,6 +240,8 @@ paired TLS consent without opening the sender main window. Isolated two-process 
 and decline demos and multicast smoke check passed. Actual frozen diagnostics
 also passed outside the checkout and from the mounted DMG. These use temporary
 identities/configuration and do not replace the physical checks above.
+
+The `ec981af` CI run 40769388025 passed all six test/build jobs and both frozen diagnostics. Inspected Python 3.12 logs on each platform show **83 passed, 1 platform-specific skip**.
 
 ## Remaining checks and one observed runtime log issue
 
