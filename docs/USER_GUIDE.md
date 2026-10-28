@@ -69,6 +69,7 @@ then try multiple files, a Unicode name, an empty file, and a larger file.
 | **Allow pairing (2 min)** | Use on the recipient before pairing | Temporarily allows new pairing requests. It is not file auto-accept. |
 | **Connect manually…** | Use only if normal discovery is unavailable | Offers manual pairing or an already-paired connection. |
 | **Choose files…** | Open the OS picker | Replaces the current file selection when you choose new files. |
+| **Remove selected / Clear list** | Edit the selected file list before sending | Removes entries from the next send and keeps original files. |
 | **Send files** | Click after choosing files and a paired recipient | Starts a request; no file content is sent before acceptance. |
 | **Transfer history** | Select a task | Chooses which task the progress area and Cancel button refer to. |
 | Progress bar / status | Watch bytes, speed, remaining size and state | A complete receipt matters more than a 100% bar. |
@@ -122,14 +123,17 @@ On the **sender**:
 1. Click **Choose files…** below the device list.
 2. In the OS picker, select files. Use Ctrl on Windows or Command on Mac for
    separate selections, or Shift for a range, then use the picker's Open action.
-3. Check the names now shown in LanBridge. Long selections display the first
-   eight names plus a count; the receiver can review the full incoming list.
+3. Review the scrollable file list in LanBridge. Hover over a name to see its full path.
 4. Click the correct **Paired** recipient in **NEARBY DEVICES**.
 5. Click the blue **Send files** button on the right.
 6. Wait for the receiver's decision. Do not treat choosing files as sending them.
 
-To change the selection, use **Choose files…** again. Cancelling the file picker
-leaves the previous selection in place. There is no per-file removal control in V1.
+To remove mistakes before sending, select entries in the file list (Ctrl on
+Windows, Command on Mac, or Shift for a range) and click **Remove selected**.
+Delete/Backspace also removes entries when the list has keyboard focus.
+**Clear list** removes all pending selections. Original files stay on disk.
+These edits affect the next send; use **Cancel transfer** to stop an existing task.
+**Choose files…** replaces the selection; cancelling its picker keeps the previous list.
 
 If **Send files** cannot be used, check all three prerequisites: selected files,
 a selected recipient, and **Paired** status. A blue background alone does not

@@ -1,3 +1,5 @@
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QLabel, QMessageBox, QPushButton
 
 from lanbridge.core.config import Settings
@@ -130,6 +132,57 @@ def test_reopening_existing_app_preserves_selection_and_does_not_send(qapp, tmp_
         worker.events.forwarded.emit([])
         assert window.isVisible() and window.paths == paths
         assert not calls
+    finally:
+        dispose(window)
+
+
+def test_removing_mistaken_files_sends_only_remaining_paths_and_keeps_originals(qapp, tmp_path, monkeypatch):
+    window, worker, calls = make_window(qapp, tmp_path, monkeypatch)
+    peer = Peer("a" * 64, "Receiver", "Desktop", "127.0.0.1", 1234)
+    worker.trust.peers[peer.id] = {"name": peer.name}
+    window.set_peers([peer])
+    window.device_list.setCurrentRow(0)
+    paths = [tmp_path / "first" / "same.txt", tmp_path / "second" / "same.txt", tmp_path / "中文 文件.txt"]
+    for index, path in enumerate(paths):
+        path.parent.mkdir(exist_ok=True)
+        path.write_text(str(index))
+    try:
+        window.set_files(paths)
+        window.files_list.item(1).setSelected(True)
+        window.remove_files_button.click()
+        window.send_button.click()
+        assert calls == [(peer.id, [paths[0], paths[2]])]
+        assert [path.read_text() for path in paths] == ["0", "1", "2"]
+        window.files_list.item(0).setSelected(True)
+        window.files_list.item(1).setSelected(True)
+        window.remove_files_button.click()
+        assert not window.paths and not window.send_button.isEnabled()
+        assert not window.clear_files_button.isEnabled() and not window.remove_files_button.isEnabled()
+        assert window.files_list.isHidden() and "Choose files" in window.files_label.text()
+    finally:
+        dispose(window)
+
+
+def test_focused_delete_and_clear_list_do_not_change_an_already_started_send(qapp, tmp_path, monkeypatch):
+    window, worker, calls = make_window(qapp, tmp_path, monkeypatch)
+    peer = Peer("a" * 64, "Receiver", "Desktop", "127.0.0.1", 1234)
+    worker.trust.peers[peer.id] = {"name": peer.name}
+    window.set_peers([peer])
+    window.device_list.setCurrentRow(0)
+    paths = [tmp_path / "keep.txt", tmp_path / "remove.txt"]
+    try:
+        window.set_files(paths)
+        window.send_button.click()
+        window.files_list.setCurrentRow(1)
+        window.files_list.setFocus()
+        qapp.processEvents()
+        QTest.keyClick(window.files_list, Qt.Key.Key_Delete)
+        assert window.paths == [paths[0]]
+        window.clear_files_button.click()
+        assert not window.paths and not window.send_button.isEnabled()
+        assert calls == [(peer.id, paths)]  # The started send owns an independent snapshot.
+        window.open_request([])
+        assert not window.paths and not window.send_button.isEnabled()
     finally:
         dispose(window)
 

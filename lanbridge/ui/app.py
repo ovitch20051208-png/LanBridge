@@ -5,8 +5,9 @@ import time
 from pathlib import Path
 
 from PySide6.QtCore import QRect, Qt, QTimer, QUrl
-from PySide6.QtGui import QAction, QColor, QDesktopServices, QIcon, QPainter, QPixmap
+from PySide6.QtGui import QAction, QColor, QDesktopServices, QIcon, QPainter, QPixmap, QShortcut
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QCheckBox,
     QComboBox,
@@ -172,14 +173,35 @@ class MainWindow(QMainWindow):
         self.files_label.setWordWrap(True)
         self.files_label.setTextFormat(Qt.TextFormat.PlainText)
         layout.addWidget(self.files_label)
+        self.files_list = QListWidget()
+        self.files_list.setAccessibleName("Files to send")
+        self.files_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.files_list.setMinimumHeight(72)
+        self.files_list.setMaximumHeight(120)
+        self.files_list.itemSelectionChanged.connect(self._file_selection)
+        self.files_list.hide()
+        layout.addWidget(self.files_list)
+        for key in ("Delete", "Backspace"):
+            shortcut = QShortcut(key, self.files_list)
+            shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
+            shortcut.activated.connect(self._remove_files)
         row = QHBoxLayout()
         choose = QPushButton("Choose files…")
         choose.clicked.connect(self._choose)
+        self.remove_files_button = QPushButton("Remove selected")
+        self.remove_files_button.setToolTip("Remove from this list; keep the original files.")
+        self.remove_files_button.setEnabled(False)
+        self.remove_files_button.clicked.connect(self._remove_files)
+        self.clear_files_button = QPushButton("Clear list")
+        self.clear_files_button.setEnabled(False)
+        self.clear_files_button.clicked.connect(lambda: self.set_files([], reveal=False))
         self.send_button = QPushButton("Send files")
         self.send_button.setObjectName("primary")
         self.send_button.setEnabled(False)
         self.send_button.clicked.connect(self._send)
         row.addWidget(choose)
+        row.addWidget(self.remove_files_button)
+        row.addWidget(self.clear_files_button)
         row.addStretch()
         row.addWidget(self.send_button)
         layout.addLayout(row)
@@ -279,14 +301,31 @@ class MainWindow(QMainWindow):
 
     def set_files(self, paths, *, reveal=True):
         self.paths = [Path(p).absolute() for p in paths]
-        if self.paths:
-            self.files_label.setText(
-                "\n".join(p.name for p in self.paths[:8])
-                + (f"\n… {len(self.paths)} files" if len(self.paths) > 8 else "")
-            )
+        self.files_list.clear()
+        for path in self.paths:
+            item = QListWidgetItem(path.name)
+            item.setToolTip(str(path))
+            item.setData(Qt.ItemDataRole.AccessibleDescriptionRole, str(path))
+            self.files_list.addItem(item)
+        self.files_label.setText(
+            f"{len(self.paths)} file(s) ready to send · select entries to remove"
+            if self.paths
+            else "Choose files or use Send with LanBridge in your file manager."
+        )
+        self.files_list.setVisible(bool(self.paths))
+        self.clear_files_button.setEnabled(bool(self.paths))
+        self._file_selection()
         self._selection()
         if reveal:
             self.reveal()
+
+    def _file_selection(self):
+        self.remove_files_button.setEnabled(bool(self.files_list.selectedItems()))
+
+    def _remove_files(self):
+        rows = {self.files_list.row(item) for item in self.files_list.selectedItems()}
+        if rows:
+            self.set_files([path for row, path in enumerate(self.paths) if row not in rows], reveal=False)
 
     def open_request(self, paths):
         if paths:

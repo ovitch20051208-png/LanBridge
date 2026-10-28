@@ -443,3 +443,18 @@ No staging remained, old files were unchanged, and ovitch still showed Paired.
 Tester confirmed Windows complete and the final Installed/Reinstall settings
 state. Screenshot 25 records actual post-crash completion. Remaining clean-system,
 login-session, signing and full manual edge cases are not inferred from this run.
+
+## M7 refinement — editable file selection — 2026-10-28
+
+The tester requested removing mistakenly chosen files from the main window.
+Both platforms now use the same scrollable, multi-select file list, Remove
+selected and Clear list controls. Delete/Backspace is scoped to the focused
+list. Full paths are available as tooltips/accessibility descriptions. Original
+files remain on disk; editing the next selection does not mutate a started
+transfer's independent path snapshot. Emptying the list clears its display and
+disables Send files. Ordinary Choose files and file-manager direct-send semantics
+are preserved.
+
+Implementation gate: **78 passed, 1 Windows-only skip**, including same-basename
+removal, real source-file preservation, remaining send paths, multi-remove,
+keyboard removal and preserving a started send. Native Cocoa desktop/file-manager/reopen checks: **25 passed**. Frozen UI and Windows physical checks are separate.
