@@ -421,4 +421,10 @@ The final `f530938` Mac bundle was also quit normally and then cold-started from
 the actual Finder Send with LanBridge action. It sent the verified 41,940,973-byte
 Windows `f530938` ZIP without a main-window Send files action (`8460e6f4…`, complete;
 Windows receipt reported by tester). PID 43135 stayed unchanged on later Finder
-application reopening. The final Windows update/reopening check is in progress.
+application reopening. The tester updated Windows to this verified package and confirmed that reopening its EXE restored the window, retained file selection and did not send.
+
+The updated Windows multi-file Send To action was physically exercised with the
+three original fixtures. Operator observed all three names in the hidden Mac
+consent dialog, clicked Decline and observed `824a3f1f…` declined at 0/78 B.
+Exact receive-folder inventory and existing small-file hashes were unchanged,
+with no staging leftovers. Windows final Declined status awaits the tester.
