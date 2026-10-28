@@ -102,3 +102,8 @@ Images 32–34 use clean `ec981af` for the corrected physical reverse Wi-Fi test
 - `34-archived-history-review.jpg`: operator selected the Archived failure from
   the real history popup and reviewed the original error/byte details again.
   Windows Failed/archive/Ready behavior was separately confirmed by the tester.
+
+- `35-retry-after-archive-complete.jpg`: same clean `ec981af`, full physical
+  Windows-to-Mac retry after failure archiving, 4.0/4.0 GiB complete. Independently
+  hashed Mac output matched the source and Windows result; no staging remained.
+  Tester confirmed Windows complete and normal completed-task archiving.

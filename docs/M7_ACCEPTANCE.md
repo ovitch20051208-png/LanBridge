@@ -193,14 +193,20 @@ preserved its exact original files. Operator clicked Archive task: bar hidden,
 Ready restored. The actual history popup retained the Archived record; operator
 reselected it, reviewed the same error/bytes and archived it again. Tester
 confirmed the same Failed/Archive/Ready/bar-hidden behavior on Windows. A new
-request `3c8838f5…` then restored ordinary percentage progress; its full retry
-verification is in progress. Mac process 52809 did not restart for these tests.
+request `3c8838f5…` then restored ordinary percentage progress and completed at
+4.0/4.0 GiB, average 20.0 MiB/s. Its 4,294,967,296-byte Mac file matched the exact
+source/Windows SHA-256. Original files stayed unchanged; no staging remained.
+Tester confirmed Windows complete and successful completed-task archiving.
+Mac process 52809 did not restart for these tests and was left at Ready after
+archiving the final completion.
 
 ![Fixed timeout reason and Failed state with actual received bytes](images/mac-m7/32-timeout-failed-fixed.jpg)
 
 ![Archiving closes the result and returns to Ready](images/mac-m7/33-task-archived-ready.jpg)
 
 ![Archived task remains reviewable in the current session](images/mac-m7/34-archived-history-review.jpg)
+
+![Full 4 GiB reverse retry after failure archiving](images/mac-m7/35-retry-after-archive-complete.jpg)
 
 The large source's streaming SHA-256 was verified before the test:
 `8479e43911dc45e89f934fe48d01297e16f51d17aa561d4d1c216b1ae0fcddca`.
@@ -251,7 +257,7 @@ The `ec981af` CI run 40769388025 passed all six test/build jobs and both frozen 
 - Developer ID/notarization and Windows publisher signing remain unperformed.
   This Mac has no valid signing identity; notarytool is available.
 - Three-physical-computer recipient selection, first-pairing Decline/revocation,
-  Wi-Fi interruption with Windows sending, Windows receiver force-kill/restart cleanup, low disk/read-only receive
+  Windows receiver force-kill/restart cleanup, low disk/read-only receive
   folders and the full manual edge-case checklist are not yet signed off.
 - At 21:37 UTC during forced Windows receiver Quit, one non-fatal asyncio
   `_call_connection_lost` traceback was logged after the correct Connection lost

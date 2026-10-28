@@ -545,3 +545,14 @@ confirmed identical Windows Failed/Archive/Ready behavior. Native screenshots
 32–34 document this phase. `ec981af` CI 40769388025 passed all six jobs; both
 Python 3.12 logs show **83 passed, 1 platform-specific skip**. Full reverse retry
 `3c8838f5…` is the next separate check.
+
+Final clean `ec981af` reverse retry `3c8838f5…` completed after archive, 4.0/4.0 GiB,
+UI average 20.0 MiB/s. The actual 4,294,967,296-byte Mac file's streaming SHA-256
+matched both the original source and the tester's earlier independent Windows
+Get-FileHash result. Original receive files retained their sizes/mtimes, no
+staging remained, and Mac PID 52809 stayed unchanged. Tester confirmed Windows
+complete and successful completed-task archive. Actual Mac completion was also
+archived and the app left at Ready. Screenshot 35 records the complete retry.
+This closes the physical Wi-Fi fault/recovery phase in both transfer directions;
+Windows receiver force-kill, storage-permission/space, clean install/login,
+remaining trust/multi-device edge cases and signing remain separate checks.

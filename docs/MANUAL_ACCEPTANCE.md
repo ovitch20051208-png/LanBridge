@@ -37,6 +37,14 @@ Repeat with Explorer → Show more options → Send to → **Send with LanBridge
 The Mac must show the incoming dialog while its main window is hidden and save
 accepted files automatically. Repeat all edge cases below in both directions.
 
+For Wi-Fi interruption, identify the exact computer to disconnect first and keep
+the control computer online. Agree a recovery interval (for example 45 seconds)
+before disconnecting; reconnect without waiting for an offline chat notification.
+Confirm actual payload bytes before the interruption, check error/cleanup, then
+start a fresh request with receiver consent and verify the complete file hash.
+Finished tasks can be archived to return to Ready; their session-history entries
+remain reviewable. Archiving is separate from cancelling an active transfer.
+
 ## Edge cases
 
 - Decline: sender sees Declined; no content/staging file remains at the receiver.
