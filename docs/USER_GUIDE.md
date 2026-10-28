@@ -208,7 +208,7 @@ New installations receive into **Desktop/LanBridge Received**. Existing saved de
 
 On Mac, **Browse… → Desktop → New Folder → Create → Open**, then **Save** in LanBridge. This exact flow was exercised on the real M3.
 
-![Real Mac receive-folder settings](images/mac-m7/05-settings.jpg)
+![Real Mac receive-folder settings](images/mac-m7/20-integration-status.jpg)
 
 To open it, use the tray/menu-bar menu's **Received Files**. This opens the
 directory in the system file manager; it does not execute a received file.
@@ -290,6 +290,8 @@ The source CLI also supports `--install-integration` and `--uninstall-integratio
 see [installation](INSTALLATION.md) if you are developing from source.
 
 On the tested M3/macOS 15.7, **Send with LanBridge** appeared directly in the Finder context menu. Its position can vary by OS settings. Real Finder selection, normal-profile single-instance forwarding and small-file transfers to Windows passed in [M7](M7_ACCEPTANCE.md); the complete edge-case and Explorer-action checklist remains a release gate.
+
+![Real Mac completion after Finder direct send, without clicking Send files](images/mac-m7/19-direct-send-complete.jpg)
 
 ![Real Mac incoming prompt while the main window was hidden](images/mac-m7/09-background-incoming.jpg)
 

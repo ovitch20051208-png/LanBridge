@@ -158,7 +158,7 @@
 
 Mac 可按 **Browse… → Desktop → New Folder → Create → Open** 操作，回到 LanBridge 后点 **Save**。这套流程已在真实 M3 上验证。
 
-![真实 Mac：接收目录设置](images/mac-m7/05-settings.jpg)
+![真实 Mac：接收目录设置](images/mac-m7/20-integration-status.jpg)
 
 通过托盘 / 菜单栏的 **Received Files** 可以直接打开接收目录；它只打开目录，不执行收到的文件。
 已有 `report.pdf` 时，新文件会保存成 `report (1).pdf`、`report (2).pdf`；
@@ -225,6 +225,8 @@ Quick Action 放在当前用户的 `~/Library/Services`。入口隐藏时检查�
 移动应用或删除源码开发环境后，重新安装入口。**Remove action** 只移除入口，保留文件与设备身份。
 开发者也可用 `--install-integration / --uninstall-integration`，见[安装说明](INSTALLATION.md)。
 本轮 M3 / macOS 15.7 实测中，**Send with LanBridge** 直接出现在 Finder 右键菜单里；不同系统设置可能放在子菜单中。真实 Finder 选文件、转交正常用户配置的已有实例，以及向 Windows 传小文件已在 [M7](M7_ACCEPTANCE.md) 验证；完整边界情况和 Explorer 入口仍需按清单验收。
+
+![真实 Mac：Finder 右键直发完成，发送时无需主窗口 Send files](images/mac-m7/19-direct-send-complete.jpg)
 
 ![真实 Mac：主窗口隐藏时的收件确认](images/mac-m7/09-background-incoming.jpg)
 

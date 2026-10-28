@@ -35,13 +35,23 @@ contents are included. Fingerprints are public device identifiers.
   lost on the Mac sender, without a success state.
 - `17-large-background-incoming.jpg` / `18-large-receive-complete.jpg`: physical
   Windows Send To entry → existing app → Mac consent → 4 GiB reverse completion.
+- `19-direct-send-complete.jpg`: real Finder cold-start direct send completed
+  without opening the sender main window or clicking Send files.
+- `20-integration-status.jpg`: final expanded settings form, complete paths,
+  persistent Installed state and Reinstall button.
+- `21-warm-direct-send-complete.jpg`: Chinese/space-named file directly requested
+  through the existing process, with no main-window Send files action.
 
 Images 01–04 use the clean `e8cd2d7` Mac build. Images 05–06 use the clean
 `cac55f8` build, as do 07–18. Both use native arm64 Python 3.12.16 / Qt 6.12.0. Older pictures
 retain their original button appearance as evidence of the first transfer.
-Screenshot speeds for tiny files include waiting/decision time; they are not
-network performance measurements. Addresses, paths and device identifiers are
+Screenshot speeds for tiny files include protocol/finalization latency; they are
+not network throughput benchmarks. Addresses, paths and device identifiers are
 specific to this test and must not be copied into another installation.
+
+Images 19 and 21 use clean `7af38d6`; image 20 uses the clean `6bccb65` layout
+correction. The initial 01–18 capture the earlier preview behavior; the file-manager
+flow subsequently changed to direct send at the tester's request.
 
 See [the verification record](../../PROGRESS.md) and
 [physical acceptance checklist](../../MANUAL_ACCEPTANCE.md) for scope and limits.
