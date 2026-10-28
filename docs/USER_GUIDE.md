@@ -289,7 +289,7 @@ Use **Remove action** to uninstall the action without deleting files or identity
 The source CLI also supports `--install-integration` and `--uninstall-integration`;
 see [installation](INSTALLATION.md) if you are developing from source.
 
-On the tested M3/macOS 15.7, **Send with LanBridge** appeared directly in the Finder context menu. Its position can vary by OS settings. Real Finder selection, normal-profile single-instance forwarding and small-file transfers to Windows passed in [M7](M7_ACCEPTANCE.md); the complete edge-case and Explorer-action checklist remains a release gate.
+On the tested M3/macOS 15.7, **Send with LanBridge** appeared directly in the Finder context menu. Its position can vary by OS settings. Real Finder selection, normal-profile single-instance forwarding and small-file transfers to Windows passed in [M7](M7_ACCEPTANCE.md); Windows right-click direct delivery also passed a physical small-file check; the remaining edge-case checklist is still a release gate.
 
 ![Real Mac completion after Finder direct send, without clicking Send files](images/mac-m7/19-direct-send-complete.jpg)
 

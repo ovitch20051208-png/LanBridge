@@ -416,3 +416,9 @@ use their respective native implementations. `c863854` CI passed all six jobs;
 Windows/macOS Python 3.12 logs each show **76 passed, 1 platform-specific skip**.
 
 `f530938` CI run 40667054324 also completed all six jobs successfully.
+
+The final `f530938` Mac bundle was also quit normally and then cold-started from
+the actual Finder Send with LanBridge action. It sent the verified 41,940,973-byte
+Windows `f530938` ZIP without a main-window Send files action (`8460e6f4…`, complete;
+Windows receipt reported by tester). PID 43135 stayed unchanged on later Finder
+application reopening. The final Windows update/reopening check is in progress.

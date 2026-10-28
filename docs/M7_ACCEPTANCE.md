@@ -29,7 +29,7 @@ finished.
 The table above identifies the core large-transfer checkpoint. The direct-send
 refinement was built cleanly at `7af38d6`; the subsequent settings-layout bundle
 is `6bccb65`, also `source_dirty=false`, arm64/Python 3.12.16/Qt 6.12.0 and passed
-strict signature verification and its actual frozen diagnostic. Latest local
+strict signature verification and its actual frozen diagnostic. Local
 package hashes at `6bccb65`:
 
 - ZIP: `536e1b5154a1bdb9128313b3ada53acc1e855b5cc5073478e165d957d649dce0`
@@ -47,6 +47,12 @@ Its inner ZIP SHA-256 is
 `1e839c29755236105886a050a2a94d6f7748416993a84cf1652999d233522591`.
 The old preview's exact build remains unknown; it was used for the earlier large
 transfer checks.
+
+The final Windows `f530938` package was separately downloaded from successful
+CI run 40667054324 and verified before LAN delivery. Inner ZIP: 41,940,973 bytes,
+SHA-256 `8850d2bc81722a8a1153a42252b46ec00f4423c814e24a70b66ae9754b59be9a`,
+`source_dirty=false`, AMD64/Python 3.12.10/Qt 6.12.0. It was renamed locally to
+`LanBridge-Windows-f530938.zip` for unambiguous receipt; its bytes are unchanged.
 
 ## Observed physical checks
 
@@ -83,6 +89,7 @@ transfer checks.
 
 | Mac application reopening | Clean `f530938`: close the main window, double-click the actual `/Applications/LanBridge.app` icon in Finder, and the same window returns. Repeated with a selected file, then with a minimized window: selection remains and no send starts. PID stayed 42873; listener stayed available while hidden. Screenshot 22 records the restored window, not the hidden interval. |
 | Windows right-click direct send | Tester reinstalled the action from `6bccb65` and invoked Send To without clicking Send files. On retry, operator observed the standalone Mac consent dialog with the main window hidden, clicked Accept, then observed request `766beab7…` complete at 37/37 B. Initial attempt timed out awaiting Mac consent and is not counted as a completed transfer. Tester also confirmed Windows displayed complete. |
+| Reopen fix / Finder regression | Quit `f530938` normally and verified no app process remained. Actual Finder Send with LanBridge on the 40 MiB updated Windows ZIP cold-started PID 43135 with --send and sent directly, without a main-window Send files action. Request `8460e6f4…` completed on Mac; tester confirmed receipt on Windows. Later double-clicking the Applications icon restored the same process window. |
 | Physical collision protection | The direct-send retry saved `01 Mac hello (2).txt`, 37 B, matching the original SHA-256. Hashes of the existing original and deliberately different `(1)` sentinel were unchanged; no `.lanbridge-*` staging directory remained. |
 
 ![Finder selection on the real Mac](images/mac-m7/02-finder-selection.jpg)
@@ -125,7 +132,7 @@ skipped**. Native Cocoa reopening/file-manager/desktop modules: **23 passed**.
 The `c863854` CI completed all six jobs successfully, including both native
 builds and frozen diagnostics. Inspected Python 3.12 logs: Windows **76 passed,
 1 native macOS test skipped**; Mac **76 passed, 1 Windows COM test skipped**.
-The startup-order follow-up `f530938` CI also completed all six jobs successfully.
+The startup-order follow-up `f530938` CI also completed all six jobs successfully; its Python 3.12 logs each show **76 passed, 1 platform-specific skip**.
 The right-click tests cover explicit authenticated IPC send intent, single/multi
 recipient dispatch, unpaired/offline/revoked targets, empty selections and actual
 paired TLS consent without opening the sender main window. Isolated two-process accept
