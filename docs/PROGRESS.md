@@ -392,3 +392,10 @@ Module checks: full gate **76 passed, 1 skipped**; native Cocoa reopening,
 file-manager and desktop modules **23 passed**. The native handler callback and
 cleanup were exercised on this Mac; frozen Finder double-click verification
 follows after rebuilding rather than being inferred from these checks.
+
+Frozen double-click testing found that registering before `app.exec()` was too
+early: AppKit installs its default AppleEvent handlers during launch, replacing
+the handler. Registration now runs on the first event-loop turn, after those
+defaults. The full gate remains **76 passed, 1 skipped**. This correction requires
+another frozen Finder check; the earlier callback-only test did not exercise
+AppKit startup ordering.

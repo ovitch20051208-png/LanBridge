@@ -71,10 +71,17 @@ def main() -> int:
     worker = NetworkWorker(settings, events, port=args.port, discovery=not args.no_discovery)
     window = MainWindow(settings, worker, events)
     if sys.platform == "darwin":
+        from PySide6.QtCore import QTimer
+
         from lanbridge.platform.macos_events import MacReopenHandler
 
-        reopen_handler = MacReopenHandler(lambda: events.forwarded.emit([]))
-        app.aboutToQuit.connect(reopen_handler.close)
+        def register_reopen_handler():
+            reopen_handler = MacReopenHandler(lambda: events.forwarded.emit([]))
+            app.aboutToQuit.connect(reopen_handler.close)
+
+        # AppKit installs its default AppleEvent handlers while finishing launch.
+        # Register after entering its event loop so those defaults cannot replace ours.
+        QTimer.singleShot(0, register_reopen_handler)
     app.aboutToQuit.connect(worker.stop)
     worker.start()
     if args.files:
