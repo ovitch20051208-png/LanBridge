@@ -217,6 +217,37 @@ The large source's streaming SHA-256 was verified before the test:
 
 ![Same-file retry completes after Windows Wi-Fi returns](images/mac-m7/30-network-retry-complete.jpg)
 
+## Receive storage gates — 2026-10-28
+
+This phase uses the existing clean `ec981af` apps and normal Mac user profile.
+Windows is the sender; Windows UI results are tester reports. Only newly created
+fixture directories/volumes are restricted. The normal Desktop receive-folder
+inventory is recorded and preserved; no physical disk is filled or reformatted.
+
+### Mac receive directory loses write permission
+
+Operator selected a writable test directory through actual Settings/Save, then
+changed only that owned directory to mode 0555. Effective user is UID 501; an
+independent temporary-directory write probe failed with errno 13. The directory
+already contained a deliberately different `01 Mac hello.txt` sentinel.
+
+Tester right-clicked the original 37 B hello on Windows. Operator observed the
+real Mac consent dialog pointing to the test directory and clicked Accept.
+Request `5f8fad5d…` became Failed with Permission denied and 0 B transferred;
+Windows tester also reported Permission denied. No staging directory or new
+file existed afterward. The existing same-name sentinel retained its SHA-256
+`031af80dca951a33172de8c4da387e7b6aed91f53f7938a6701b7c22740322e4`
+and mtime; all nine normal Desktop receive files retained their sizes/mtimes.
+
+Actual Archive task returned Ready. Test directory permissions were restored to
+0755 and App settings restored via the UI to exactly their original values,
+including Desktop/LanBridge Received and login startup disabled. PID 52809 and
+its listeners remained running; no re-pair/restart occurred. Existing isolated
+security checks: **33 passed**. No source-code change was required for this case.
+This is Mac receiving; Windows receiving/storage-denial remains a separate test.
+
+![Real receive failure when the configured directory becomes unwritable](images/mac-m7/36-receive-permission-denied.jpg)
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |
@@ -257,8 +288,8 @@ The `ec981af` CI run 40769388025 passed all six test/build jobs and both frozen 
 - Developer ID/notarization and Windows publisher signing remain unperformed.
   This Mac has no valid signing identity; notarytool is available.
 - Three-physical-computer recipient selection, first-pairing Decline/revocation,
-  Windows receiver force-kill/restart cleanup, low disk/read-only receive
-  folders and the full manual edge-case checklist are not yet signed off.
+  Windows receiver force-kill/restart cleanup, Windows receive-storage faults,
+  Mac low-disk gate and the full manual edge-case checklist are not yet signed off.
 - At 21:37 UTC during forced Windows receiver Quit, one non-fatal asyncio
   `_call_connection_lost` traceback was logged after the correct Connection lost
   UI error. Subsequent real transfers succeeded and cleanup was reported by the

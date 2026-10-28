@@ -107,3 +107,9 @@ Images 32–34 use clean `ec981af` for the corrected physical reverse Wi-Fi test
   Windows-to-Mac retry after failure archiving, 4.0/4.0 GiB complete. Independently
   hashed Mac output matched the source and Windows result; no staging remained.
   Tester confirmed Windows complete and normal completed-task archiving.
+
+- `36-receive-permission-denied.jpg`: clean `ec981af`, receiving the real
+  Windows hello offer into an owned test directory that lost write permission.
+  Failure at 0 B, Failed label and Archive task were observed; original files
+  and sentinel hash were unchanged, with no staging. Permissions and normal
+  App receive settings were restored after this capture.

@@ -556,3 +556,17 @@ archived and the app left at Ready. Screenshot 35 records the complete retry.
 This closes the physical Wi-Fi fault/recovery phase in both transfer directions;
 Windows receiver force-kill, storage-permission/space, clean install/login,
 remaining trust/multi-device edge cases and signing remain separate checks.
+
+## M7 continuation — receiving directory permissions — 2026-10-28
+
+Actual normal-profile Settings selected a generated writable directory, then
+only that directory was changed to 0555. UID 501 write probe confirmed EACCES.
+Physical Windows hello offer `5f8fad5d…` was explicitly accepted on Mac; both
+sides reported Permission denied, Mac showed Failed/0 B, and no payload/staging
+or new final file was retained. A different pre-existing same-name sentinel's
+hash/mtime and all nine normal Desktop receive files were unchanged.
+Permissions were restored to 0755 and App settings restored through the actual
+UI; decoded settings exactly matched the pre-test snapshot. PID 52809 continued
+running. Native screenshot 36 records the failure. Existing security suite:
+**33 passed**. This phase needed no code change; Windows receiving permission
+faults and actual Mac low-space validation are separate.
