@@ -399,3 +399,20 @@ the handler. Registration now runs on the first event-loop turn, after those
 defaults. The full gate remains **76 passed, 1 skipped**. This correction requires
 another frozen Finder check; the earlier callback-only test did not exercise
 AppKit startup ordering.
+
+Clean `f530938` frozen Finder verification passed: closing then double-clicking
+`/Applications/LanBridge.app` restored the main window; repeated with a selected
+file and with a minimized window. Selection remained without sending, and PID
+42873 stayed unchanged. Background listener remained available. Actual Windows
+`6bccb65` Send To direct send was then accepted on the hidden Mac (`766beab7…`,
+37 B), completed and saved as `(2)` without overwriting the original or the
+different `(1)` sentinel. All hashes and staging cleanup passed on Mac; the tester confirmed Windows also displayed complete. Screenshot evidence is 22–24.
+
+Cross-platform behavior is shared: Desktop receive-folder default and custom
+folder creation/selection, one-recipient direct send/multi-recipient selection,
+persistent install state and reinstall feedback, visible buttons/dialogs and
+existing-window reopening. Finder/Send To, menu-bar/tray and login registration
+use their respective native implementations. `c863854` CI passed all six jobs;
+Windows/macOS Python 3.12 logs each show **76 passed, 1 platform-specific skip**.
+
+`f530938` CI run 40667054324 also completed all six jobs successfully.

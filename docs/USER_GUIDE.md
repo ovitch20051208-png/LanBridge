@@ -305,6 +305,13 @@ Windows uses the extracted LanBridge.exe or its shortcut. This keeps one running
 instance and preserves the previous selection. A source folder named LanBridge
 is a project folder, not the installed application.
 
+The Desktop receive-folder default, custom folder creation/selection, direct
+file-manager send, installation status and reopening the same window apply to
+both Windows and Mac. Tray/menu-bar and file-manager entry points follow each
+platform's conventions.
+
+![Real Mac: reopening the installed app restores the same window and selected file](images/mac-m7/22-reopened-window.jpg)
+
 Closing the main window normally hides it while the app remains in the Windows
 system tray / macOS menu bar. Keep both peers awake and connected to receive.
 On a desktop with no tray support, closing the window can quit instead.

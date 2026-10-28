@@ -1,6 +1,6 @@
 # M7 physical Mac and two-computer evidence
 
-Date: 2026-10-27. Mac operated through native UI automation; Windows operated by
+Dates: 2026-10-27–28. Mac operated through native UI automation; Windows operated by
 the project owner and reported in chat. Windows screenshots/control are not
 available to the Mac operator. This record distinguishes observed Mac results
 from the tester's Windows reports; the complete manual release gate is not yet
@@ -30,10 +30,23 @@ The table above identifies the core large-transfer checkpoint. The direct-send
 refinement was built cleanly at `7af38d6`; the subsequent settings-layout bundle
 is `6bccb65`, also `source_dirty=false`, arm64/Python 3.12.16/Qt 6.12.0 and passed
 strict signature verification and its actual frozen diagnostic. Latest local
-package hashes:
+package hashes at `6bccb65`:
 
 - ZIP: `536e1b5154a1bdb9128313b3ada53acc1e855b5cc5073478e165d957d649dce0`
 - DMG: `66912b189807e49235868f840fc6f090b16a7041a087f87be28c10a0daf2f763`
+
+The application-reopen correction is built cleanly at `f530938`, with the same
+native arm64/Python/Qt environment, strict signature verification and frozen
+diagnostic passing. Current local package hashes:
+
+- ZIP: `f381fbd743426872f0df3a62a380a7427e68b7dfeb92897605f0092afac80d58`
+- DMG: `dfc990e90867fa8f45619d721e657e0934097efc82b62347fc7142cd3d6f5810`
+
+Windows was updated by the tester to the CI-built `6bccb65` portable package.
+Its inner ZIP SHA-256 is
+`1e839c29755236105886a050a2a94d6f7748416993a84cf1652999d233522591`.
+The old preview's exact build remains unknown; it was used for the earlier large
+transfer checks.
 
 ## Observed physical checks
 
@@ -66,6 +79,11 @@ package hashes:
 | New Finder cold-start direct send | Clean `7af38d6` app initially stopped; real Finder action launched --send and issued a 37 B request to the sole paired online Windows peer, with no main-window Send files click. Tester accepted; Mac completion `7fd9f2dd…` observed afterward. |
 | New Finder existing-instance direct send | Real Finder action on a Chinese/space-named 41 B file forwarded send intent to the same PID 34896, issued the request directly, and completed (`65de2700…`). Tester confirmed receipt; no extra app process remained. |
 | Persistent install state | Actual Settings showed Installed, its action path and Reinstall. Reinstall showed explicit no-download feedback and retained one workflow containing only Info.plist/document.wflow. The `6bccb65` form was visually rechecked with a readable full receive path, fingerprint and hint. |
+
+
+| Mac application reopening | Clean `f530938`: close the main window, double-click the actual `/Applications/LanBridge.app` icon in Finder, and the same window returns. Repeated with a selected file, then with a minimized window: selection remains and no send starts. PID stayed 42873; listener stayed available while hidden. Screenshot 22 records the restored window, not the hidden interval. |
+| Windows right-click direct send | Tester reinstalled the action from `6bccb65` and invoked Send To without clicking Send files. On retry, operator observed the standalone Mac consent dialog with the main window hidden, clicked Accept, then observed request `766beab7…` complete at 37/37 B. Initial attempt timed out awaiting Mac consent and is not counted as a completed transfer. Tester also confirmed Windows displayed complete. |
+| Physical collision protection | The direct-send retry saved `01 Mac hello (2).txt`, 37 B, matching the original SHA-256. Hashes of the existing original and deliberately different `(1)` sentinel were unchanged; no `.lanbridge-*` staging directory remained. |
 
 ![Finder selection on the real Mac](images/mac-m7/02-finder-selection.jpg)
 
@@ -102,8 +120,12 @@ package hashes:
 
 ## Automated checks
 
-Latest full Mac gate: documentation, lint/format, **74 passed, 1 Windows COM test
-skipped**. Native Cocoa desktop/IPC/integration modules: **25 passed, 1 skipped**.
+Latest full Mac gate: documentation, lint/format, **76 passed, 1 Windows COM test
+skipped**. Native Cocoa reopening/file-manager/desktop modules: **23 passed**.
+The `c863854` CI completed all six jobs successfully, including both native
+builds and frozen diagnostics. Inspected Python 3.12 logs: Windows **76 passed,
+1 native macOS test skipped**; Mac **76 passed, 1 Windows COM test skipped**.
+The startup-order follow-up `f530938` CI also completed all six jobs successfully.
 The right-click tests cover explicit authenticated IPC send intent, single/multi
 recipient dispatch, unpaired/offline/revoked targets, empty selections and actual
 paired TLS consent without opening the sender main window. Isolated two-process accept

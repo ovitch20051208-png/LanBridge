@@ -224,7 +224,7 @@ Quick Action 放在当前用户的 `~/Library/Services`。入口隐藏时检查�
 
 移动应用或删除源码开发环境后，重新安装入口。**Remove action** 只移除入口，保留文件与设备身份。
 开发者也可用 `--install-integration / --uninstall-integration`，见[安装说明](INSTALLATION.md)。
-本轮 M3 / macOS 15.7 实测中，**Send with LanBridge** 直接出现在 Finder 右键菜单里；不同系统设置可能放在子菜单中。真实 Finder 选文件、转交正常用户配置的已有实例，以及向 Windows 传小文件已在 [M7](M7_ACCEPTANCE.md) 验证；完整边界情况和 Explorer 入口仍需按清单验收。
+本轮 M3 / macOS 15.7 实测中，**Send with LanBridge** 直接出现在 Finder 右键菜单里；不同系统设置可能放在子菜单中。真实 Finder 选文件、转交正常用户配置的已有实例，以及向 Windows 传小文件已在 [M7](M7_ACCEPTANCE.md) 验证；Windows 右键直发也已完成小文件实机验证；其余边界情况仍按清单验收。
 
 ![真实 Mac：Finder 右键直发完成，发送时无需主窗口 Send files](images/mac-m7/19-direct-send-complete.jpg)
 
@@ -234,9 +234,14 @@ Quick Action 放在当前用户的 `~/Library/Services`。入口隐藏时检查�
 
 ## 10. 后台运行：关窗口不等于退出
 
+桌面接收目录默认值、自定义目录创建与选择、右键直发、安装状态提示和重开同一窗口，
+均适用于 Windows 和 Mac；菜单栏 / 托盘与文件右键入口使用各自系统的形式。
+
 要回到已有窗口，可从托盘 / 菜单栏选择 **Open LanBridge**，也可重新打开已安装程序。
 Mac 使用“应用程序/LanBridge.app”，Windows 使用完整解压后的 LanBridge.exe 或其快捷方式；
 这会唤回同一个实例并保留之前选中的文件。名为 LanBridge 的源码文件夹是项目目录，不是应用。
+
+![真实 Mac：关闭窗口后双击应用，保留已选文件并恢复同一窗口](images/mac-m7/22-reopened-window.jpg)
 
 正常关闭主窗口会隐藏窗口，接收服务继续留在 Windows 托盘 / Mac 菜单栏。两台电脑仍须保持唤醒和联网。
 没有托盘支持的桌面环境中，关窗口可能退出应用。

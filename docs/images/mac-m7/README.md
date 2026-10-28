@@ -1,4 +1,4 @@
-# Physical Mac M7 captures — 2026-10-27
+# Physical Mac M7 captures — 2026-10-27–28
 
 These JPEGs are unedited captures of the real application/Finder on an Apple M3,
 macOS 15.7 (24G222), captured with native computer-control screenshots. The app
@@ -55,3 +55,13 @@ flow subsequently changed to direct send at the tester's request.
 
 See [the verification record](../../PROGRESS.md) and
 [physical acceptance checklist](../../MANUAL_ACCEPTANCE.md) for scope and limits.
+
+Images 22–24 were captured on 2026-10-28 with clean `f530938`:
+
+- `22-reopened-window.jpg`: actual Finder double-click restored the existing
+  hidden window with the selected filename retained and no transfer started.
+- `23-windows-direct-incoming.jpg`: real Windows `6bccb65` Send To direct offer;
+  Mac main window was hidden and operator subsequently clicked Accept.
+- `24-windows-direct-complete.jpg`: observed receive completion for that offer.
+  Separate filesystem hash checks confirmed collision suffix `(2)`, unchanged
+  existing files and no staging leftovers.
