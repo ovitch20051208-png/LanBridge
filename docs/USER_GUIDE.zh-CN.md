@@ -89,7 +89,7 @@
 
 ## 4. 选择并发送文件
 
-![发送前：已配对接收方、三个文件、Choose files 和右边的 Send files](images/user-guide/03-files-ready.jpg)
+![真实 Mac：选中误选条目后点击 Remove selected](images/mac-m7/26-edit-file-selection.jpg)
 
 在**发送方**：
 

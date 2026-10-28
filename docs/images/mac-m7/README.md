@@ -70,3 +70,11 @@ Images 22–24 were captured on 2026-10-28 with clean `f530938`:
   SIGKILL during a real 4 GiB stream and automatic staging cleanup on restart.
   A new physical Windows right-click offer completed on this Mac; tester also
   confirmed Windows complete. The peer remained Online/Paired.
+
+Images 26–27 use clean `597e8a3` on the same M3:
+
+- `26-edit-file-selection.jpg`: selected the Chinese-named entry in the real
+  multi-select send list; Remove selected is enabled.
+- `27-remaining-files-complete.jpg`: after removing that entry, only hello/empty
+  remain and their 37 B physical transfer completed; Windows tester confirmed
+  exactly those two incoming files and receipt. Source-file hashes were unchanged.

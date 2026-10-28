@@ -116,7 +116,7 @@ trust. Subsequent file requests still show their own Accept/Decline dialog.
 
 ## 4. Select files and send
 
-![Paired receiver and selected files; Choose files and Send files are at the bottom of the file area](images/user-guide/03-files-ready.jpg)
+![Real Mac: select mistaken entries and use Remove selected before sending](images/mac-m7/26-edit-file-selection.jpg)
 
 On the **sender**:
 

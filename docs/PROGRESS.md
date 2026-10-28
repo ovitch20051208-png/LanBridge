@@ -458,3 +458,12 @@ are preserved.
 Implementation gate: **78 passed, 1 Windows-only skip**, including same-basename
 removal, real source-file preservation, remaining send paths, multi-remove,
 keyboard removal and preserving a started send. Native Cocoa desktop/file-manager/reopen checks: **25 passed**. Frozen UI and Windows physical checks are separate.
+
+Clean `597e8a3` frozen arm64 UI verification passed. In the actual main window,
+three native-picker files became two after removing the Chinese-named file.
+Only hello/empty, 37 B, were sent (`e013fda5…`, complete on Mac); the Windows
+tester confirmed the two-file incoming list and receipt. Original SHA-256 values
+of all three source files remained unchanged. Actual Clear list emptied the
+view and disabled Send files/Clear list. Screenshots 26–27 document this phase.
+`597e8a3` CI's four test jobs and native Mac build passed; Windows build and
+physical editable-list validation are recorded separately when available.

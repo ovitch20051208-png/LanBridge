@@ -54,6 +54,11 @@ SHA-256 `8850d2bc81722a8a1153a42252b46ec00f4423c814e24a70b66ae9754b59be9a`,
 `source_dirty=false`, AMD64/Python 3.12.10/Qt 6.12.0. It was renamed locally to
 `LanBridge-Windows-f530938.zip` for unambiguous receipt; its bytes are unchanged.
 
+Editable file-selection build: clean `597e8a3`, arm64/Python 3.12.16/Qt 6.12.0,
+strict signature and frozen diagnostic passed. ZIP SHA-256
+`8d56ff0a2e13971922b59fbe06d2c93f474a6a211a663580566d549bca92704a`;
+DMG `aed61da36dd3559ebdea519dd06b7bed247da5ff5046f1ae99195a7da0735ad3`.
+
 ## Observed physical checks
 
 | Check | Evidence / scope |
@@ -95,6 +100,7 @@ SHA-256 `8850d2bc81722a8a1153a42252b46ec00f4423c814e24a70b66ae9754b59be9a`,
 | Windows installation status | Tester confirmed the final Windows Settings showed File-manager action: Installed and Reinstall file-manager action. |
 | Mac receiver force-kill / restart cleanup | While real Windows request `a59208e3…` was receiving, operator observed payload progress, then SIGKILLed only PID 43135. An owned staging file of 90,341,376 bytes was confirmed present after termination. Finder-restarted PID 43379 automatically removed it before serving. Directory inventory, original file sizes/mtimes and original 4 GiB SHA-256 were unchanged. Windows tester reported “指定的网络名不再可用” (the specified network name is no longer available), not success. |
 | Post-crash transfer recovery | Restarted Mac discovered ovitch as Online/Paired. Tester right-clicked the original 37 B text again; operator accepted its standalone prompt with main window hidden. `e021896f…` completed and saved as `(3)` with the original SHA-256; all pre-test files stayed unchanged and no staging directory remained. Tester confirmed Windows complete. |
+| Editable Mac file selection | Operator chose all three original fixtures in the native picker, selected the Chinese file in the actual main-window list and clicked Remove selected. Only hello/empty remained. `e013fda5…` sent 37 B and completed on Mac; tester confirmed Windows listed only these two files and received them. All three source-file SHA-256 values remained unchanged. Actual Clear list emptied the view and disabled Send files/Clear list. Screenshots 26–27. |
 | Physical collision protection | The direct-send retry saved `01 Mac hello (2).txt`, 37 B, matching the original SHA-256. Hashes of the existing original and deliberately different `(1)` sentinel were unchanged; no `.lanbridge-*` staging directory remained. |
 
 ![Finder selection on the real Mac](images/mac-m7/02-finder-selection.jpg)
@@ -134,8 +140,8 @@ SHA-256 `8850d2bc81722a8a1153a42252b46ec00f4423c814e24a70b66ae9754b59be9a`,
 
 ## Automated checks
 
-Latest full Mac gate: documentation, lint/format, **76 passed, 1 Windows COM test
-skipped**. Native Cocoa reopening/file-manager/desktop modules: **23 passed**.
+Latest full Mac gate after editable file selection: documentation, lint/format, **78 passed, 1 Windows COM test
+skipped**. Native Cocoa reopening/file-manager/desktop modules: **25 passed**.
 The `c863854` CI completed all six jobs successfully, including both native
 builds and frozen diagnostics. Inspected Python 3.12 logs: Windows **76 passed,
 1 native macOS test skipped**; Mac **76 passed, 1 Windows COM test skipped**.
