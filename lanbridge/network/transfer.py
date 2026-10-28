@@ -32,6 +32,14 @@ log = logging.getLogger(__name__)
 Consent = Callable[[str, Offer], Awaitable[bool]]
 
 
+def _error_message(exc: Exception) -> str:
+    if message := str(exc).strip():
+        return message
+    if isinstance(exc, TimeoutError):
+        return "Connection timed out. Check the network connection, then send the files again."
+    return f"Transfer failed ({type(exc).__name__})"
+
+
 async def await_consent(reader: asyncio.StreamReader, decision: Awaitable[bool], timeout: float) -> bool:
     consent_task = asyncio.create_task(decision)
     disconnected = asyncio.create_task(reader.read(1))
@@ -170,6 +178,7 @@ class TransferServer:
         self.connections.add(task)
         offer = None
         stage = None
+        done = 0
         published: list[Path] = []
         try:
             if len(self.connections) > 8:
@@ -202,7 +211,7 @@ class TransferServer:
                 stage.chmod(0o700)
             (stage / ".owner").write_text(self.identity.id, encoding="ascii")
             await send(writer, "accepted", id=offer.id)
-            done, started = 0, time.monotonic()
+            started = time.monotonic()
             for index, spec in enumerate(offer.files):
                 digest = hashlib.sha256()
                 with (stage / str(index)).open("xb") as output:
@@ -253,16 +262,17 @@ class TransferServer:
             self.completed(peer_id, published)
         except asyncio.CancelledError:
             if offer:
-                self.progress(Progress(offer.id, "receive", 0, offer.total, 0, "cancelled"))
+                self.progress(Progress(offer.id, "receive", done, offer.total, 0, "cancelled"))
             for path in published:
                 path.unlink(missing_ok=True)
             raise
         except (OSError, ValueError, ProtocolError, TimeoutError, asyncio.IncompleteReadError) as exc:
-            log.info("Incoming transfer failed: %s", exc)
+            message = _error_message(exc)
+            log.info("Incoming transfer failed: %s", message)
             if offer:
-                self.progress(Progress(offer.id, "receive", 0, offer.total, 0, f"error: {exc}"))
+                self.progress(Progress(offer.id, "receive", done, offer.total, 0, f"error: {message}"))
             with contextlib.suppress(OSError, TimeoutError, ProtocolError):
-                await send(writer, "error", message=str(exc)[:300])
+                await send(writer, "error", message=message[:300])
             # If publication failed halfway, remove only files we just created.
             for path in published:
                 path.unlink(missing_ok=True)
@@ -365,8 +375,11 @@ async def send_files(
             raise TransferCancelled("Transfer cancelled") from None
         raise
     except (OSError, ValueError, ProtocolError, TimeoutError, asyncio.IncompleteReadError) as exc:
-        state = "cancelled" if isinstance(exc, TransferCancelled) else f"error: {exc}"
+        message = _error_message(exc)
+        state = "cancelled" if isinstance(exc, TransferCancelled) else f"error: {message}"
         progress(Progress(offer.id, "send", done, offer.total, 0, state))
+        if isinstance(exc, TimeoutError) and not str(exc).strip():
+            raise ProtocolError(message) from exc
         raise
     finally:
         watcher.cancel()

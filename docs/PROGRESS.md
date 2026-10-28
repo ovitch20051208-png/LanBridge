@@ -497,3 +497,23 @@ resolved. Six related isolated disconnect/cancel/restart-cleanup tests passed.
 Native screenshots 28–30 show payload, failure and successful retry. Reverse-role
 Wi-Fi interruption remains a separate check. No code/security setting changes
 were needed for this phase.
+
+## M7 reverse Wi-Fi fault — empty timeout diagnostics — 2026-10-28
+
+Tester explicitly confirmed both Wi-Fi toggles affected Windows, while Mac kept
+its network. In reverse request `76cf46fe…`, Mac accepted with the main window
+hidden and an owned staging file contained 83,214,336 bytes before Windows Wi-Fi
+was disabled. Mac then timed out, automatically removed all staging and left its
+exact original receive inventory unchanged. However, native UI showed empty
+`error:` and reset received bytes to 0; the new log also had an empty failure
+reason. Windows reported its send error as the network name no longer available.
+Screenshot 31 preserves the unfixed clean `597e8a3` behavior.
+
+Transfer diagnostics now give message-less network timeouts an actionable
+Connection timed out explanation, shared by sender/receiver progress, error
+frames and logs. Receiver failure/cancellation retains actual bytes received for
+history instead of replacing them with zero. Existing consent-timeout messages
+and all TLS/pinning/consent checks stay in place. Full gate: **80 passed, 1 skipped**;
+real paired-TLS regression verifies partial-byte accounting, nonempty timeout
+message and automatic staging removal; sender-side timeout propagation is also
+covered. The separately requested terminal progress/archiving UI follows next.
