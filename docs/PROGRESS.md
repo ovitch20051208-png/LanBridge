@@ -427,4 +427,19 @@ The updated Windows multi-file Send To action was physically exercised with the
 three original fixtures. Operator observed all three names in the hidden Mac
 consent dialog, clicked Decline and observed `824a3f1f…` declined at 0/78 B.
 Exact receive-folder inventory and existing small-file hashes were unchanged,
-with no staging leftovers. Windows final Declined status awaits the tester.
+with no staging leftovers. The tester confirmed Windows also displayed declined.
+
+Mac receiver force-kill/restart phase passed on clean `f530938`: during physical
+Windows 4 GiB request `a59208e3…`, SIGKILL of only LanBridge PID 43135 left a
+90,341,376-byte owned staging file. Finder restart (PID 43379) removed it
+automatically. Exact inventory, original sizes/mtimes and the original complete
+4 GiB SHA-256 stayed unchanged. Windows reported “指定的网络名不再可用”, not success.
+Finder also reported the intentionally terminated cold-start workflow's Run
+Shell Script error; it was dismissed before normal reopening.
+
+A new real right-click Windows offer after restart (`e021896f…`, 37 B) was accepted
+on the hidden Mac, completed, saved as `(3)` and matched the original SHA-256.
+No staging remained, old files were unchanged, and ovitch still showed Paired.
+Tester confirmed Windows complete and the final Installed/Reinstall settings
+state. Screenshot 25 records actual post-crash completion. Remaining clean-system,
+login-session, signing and full manual edge cases are not inferred from this run.

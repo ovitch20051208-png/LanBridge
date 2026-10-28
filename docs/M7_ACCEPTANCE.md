@@ -91,7 +91,10 @@ SHA-256 `8850d2bc81722a8a1153a42252b46ec00f4423c814e24a70b66ae9754b59be9a`,
 | Windows right-click direct send | Tester reinstalled the action from `6bccb65` and invoked Send To without clicking Send files. On retry, operator observed the standalone Mac consent dialog with the main window hidden, clicked Accept, then observed request `766beab7…` complete at 37/37 B. Initial attempt timed out awaiting Mac consent and is not counted as a completed transfer. Tester also confirmed Windows displayed complete. |
 | Reopen fix / Finder regression | Quit `f530938` normally and verified no app process remained. Actual Finder Send with LanBridge on the 40 MiB updated Windows ZIP cold-started PID 43135 with --send and sent directly, without a main-window Send files action. Request `8460e6f4…` completed on Mac; tester confirmed receipt on Windows. Later double-clicking the Applications icon restored the same process window. |
 | Updated Windows reopening | Tester quit the old build, fully extracted the verified `f530938` package and opened its EXE. After selecting a file and closing the window, opening that EXE again restored the window, retained selection and did not send, as reported by the tester. |
-| Updated Windows multi-file action / reverse Decline | Tester was instructed to reinstall the native action from the new fixed location, then right-clicked the original text, Chinese/space-named text and empty file. Operator observed all three names, 78 B, in the hidden Mac's consent dialog and clicked Decline. Mac task `824a3f1f…` showed declined, 0/78 B. Exact directory inventory and existing small-file hashes remained unchanged; no staging directory remained. Windows final Declined status is awaiting confirmation. |
+| Updated Windows multi-file action / reverse Decline | Tester was instructed to reinstall the native action from the new fixed location, then right-clicked the original text, Chinese/space-named text and empty file. Operator observed all three names, 78 B, in the hidden Mac's consent dialog and clicked Decline. Mac task `824a3f1f…` showed declined, 0/78 B. Exact directory inventory and existing small-file hashes remained unchanged; no staging directory remained. Tester confirmed Windows also displayed declined. |
+| Windows installation status | Tester confirmed the final Windows Settings showed File-manager action: Installed and Reinstall file-manager action. |
+| Mac receiver force-kill / restart cleanup | While real Windows request `a59208e3…` was receiving, operator observed payload progress, then SIGKILLed only PID 43135. An owned staging file of 90,341,376 bytes was confirmed present after termination. Finder-restarted PID 43379 automatically removed it before serving. Directory inventory, original file sizes/mtimes and original 4 GiB SHA-256 were unchanged. Windows tester reported “指定的网络名不再可用” (the specified network name is no longer available), not success. |
+| Post-crash transfer recovery | Restarted Mac discovered ovitch as Online/Paired. Tester right-clicked the original 37 B text again; operator accepted its standalone prompt with main window hidden. `e021896f…` completed and saved as `(3)` with the original SHA-256; all pre-test files stayed unchanged and no staging directory remained. Tester confirmed Windows complete. |
 | Physical collision protection | The direct-send retry saved `01 Mac hello (2).txt`, 37 B, matching the original SHA-256. Hashes of the existing original and deliberately different `(1)` sentinel were unchanged; no `.lanbridge-*` staging directory remained. |
 
 ![Finder selection on the real Mac](images/mac-m7/02-finder-selection.jpg)
@@ -117,6 +120,8 @@ SHA-256 `8850d2bc81722a8a1153a42252b46ec00f4423c814e24a70b66ae9754b59be9a`,
 ![Explorer-originated large offer on a hidden Mac](images/mac-m7/17-large-background-incoming.jpg)
 
 ![4 GiB reverse receive complete](images/mac-m7/18-large-receive-complete.jpg)
+
+![Successful real transfer after receiver force-kill and restart](images/mac-m7/25-post-crash-recovery.jpg)
 
 ## Generated small-file reference hashes
 
@@ -150,7 +155,7 @@ identities/configuration and do not replace the physical checks above.
 - Developer ID/notarization and Windows publisher signing remain unperformed.
   This Mac has no valid signing identity; notarytool is available.
 - Three-physical-computer recipient selection, first-pairing Decline/revocation,
-  Wi-Fi toggling, receiver force-kill/restart cleanup, low disk/read-only receive
+  Wi-Fi toggling, Windows receiver force-kill/restart cleanup, low disk/read-only receive
   folders and the full manual edge-case checklist are not yet signed off.
 - At 21:37 UTC during forced Windows receiver Quit, one non-fatal asyncio
   `_call_connection_lost` traceback was logged after the correct Connection lost
@@ -158,6 +163,12 @@ identities/configuration and do not replace the physical checks above.
   tester. Its signature resembles a reported [CPython duplicate-teardown issue](https://github.com/python/cpython/issues/156512),
   but this host's exact trigger has not been independently isolated; no runtime
   monkeypatch or exception suppression was applied.
+
+During the intentional Mac SIGKILL, the Finder Quick Action that had cold-started
+the app reported a Run Shell Script error, including an IMK mach-port diagnostic.
+The operator dismissed it with OK before reopening the app; startup cleanup and
+the subsequent real transfer passed. This observation is specific to the forced
+termination and is not evidence of a normal-launch failure.
 
 See [PROGRESS](PROGRESS.md) for checkpoint commits and CI, and
 [MANUAL_ACCEPTANCE](MANUAL_ACCEPTANCE.md) for the remaining full release checklist.

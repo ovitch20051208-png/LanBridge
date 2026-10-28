@@ -65,3 +65,8 @@ Images 22–24 were captured on 2026-10-28 with clean `f530938`:
 - `24-windows-direct-complete.jpg`: observed receive completion for that offer.
   Separate filesystem hash checks confirmed collision suffix `(2)`, unchanged
   existing files and no staging leftovers.
+
+- `25-post-crash-recovery.jpg`: same clean `f530938`, after intentional receiver
+  SIGKILL during a real 4 GiB stream and automatic staging cleanup on restart.
+  A new physical Windows right-click offer completed on this Mac; tester also
+  confirmed Windows complete. The peer remained Online/Paired.
