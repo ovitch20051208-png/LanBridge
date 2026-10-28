@@ -310,7 +310,7 @@ instance and preserves the previous selection. A source folder named LanBridge
 is a project folder, not the installed application.
 
 The Desktop receive-folder default, custom folder creation/selection, direct
-file-manager send, installation status and reopening the same window apply to
+file-manager send, editable file selection, installation status and reopening the same window apply to
 both Windows and Mac. Tray/menu-bar and file-manager entry points follow each
 platform's conventions.
 

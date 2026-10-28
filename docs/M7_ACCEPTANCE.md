@@ -37,7 +37,7 @@ package hashes at `6bccb65`:
 
 The application-reopen correction is built cleanly at `f530938`, with the same
 native arm64/Python/Qt environment, strict signature verification and frozen
-diagnostic passing. Current local package hashes:
+diagnostic passing. Package hashes for this checkpoint:
 
 - ZIP: `f381fbd743426872f0df3a62a380a7427e68b7dfeb92897605f0092afac80d58`
 - DMG: `dfc990e90867fa8f45619d721e657e0934097efc82b62347fc7142cd3d6f5810`
@@ -48,7 +48,7 @@ Its inner ZIP SHA-256 is
 The old preview's exact build remains unknown; it was used for the earlier large
 transfer checks.
 
-The final Windows `f530938` package was separately downloaded from successful
+The Windows reopening-checkpoint `f530938` package was separately downloaded from successful
 CI run 40667054324 and verified before LAN delivery. Inner ZIP: 41,940,973 bytes,
 SHA-256 `8850d2bc81722a8a1153a42252b46ec00f4423c814e24a70b66ae9754b59be9a`,
 `source_dirty=false`, AMD64/Python 3.12.10/Qt 6.12.0. It was renamed locally to
@@ -58,6 +58,12 @@ Editable file-selection build: clean `597e8a3`, arm64/Python 3.12.16/Qt 6.12.0,
 strict signature and frozen diagnostic passed. ZIP SHA-256
 `8d56ff0a2e13971922b59fbe06d2c93f474a6a211a663580566d549bca92704a`;
 DMG `aed61da36dd3559ebdea519dd06b7bed247da5ff5046f1ae99195a7da0735ad3`.
+
+The editable-selection Windows `597e8a3` package from CI run 40669476207 was
+verified and delivered for physical validation as `LanBridge-Windows-597e8a3.zip`:
+41,941,100 bytes, SHA-256
+`1dab09ba17df272a01760c17d707016379fcb1e9784eac1de6573a06959e2cc9`,
+`source_dirty=false`, AMD64/Python 3.12.10/Qt 6.12.0.
 
 ## Observed physical checks
 
@@ -101,6 +107,7 @@ DMG `aed61da36dd3559ebdea519dd06b7bed247da5ff5046f1ae99195a7da0735ad3`.
 | Mac receiver force-kill / restart cleanup | While real Windows request `a59208e3…` was receiving, operator observed payload progress, then SIGKILLed only PID 43135. An owned staging file of 90,341,376 bytes was confirmed present after termination. Finder-restarted PID 43379 automatically removed it before serving. Directory inventory, original file sizes/mtimes and original 4 GiB SHA-256 were unchanged. Windows tester reported “指定的网络名不再可用” (the specified network name is no longer available), not success. |
 | Post-crash transfer recovery | Restarted Mac discovered ovitch as Online/Paired. Tester right-clicked the original 37 B text again; operator accepted its standalone prompt with main window hidden. `e021896f…` completed and saved as `(3)` with the original SHA-256; all pre-test files stayed unchanged and no staging directory remained. Tester confirmed Windows complete. |
 | Editable Mac file selection | Operator chose all three original fixtures in the native picker, selected the Chinese file in the actual main-window list and clicked Remove selected. Only hello/empty remained. `e013fda5…` sent 37 B and completed on Mac; tester confirmed Windows listed only these two files and received them. All three source-file SHA-256 values remained unchanged. Actual Clear list emptied the view and disabled Send files/Clear list. Screenshots 26–27. |
+| Editable Windows file selection | Tester updated to verified `597e8a3`, chose all three fixtures, Ctrl-selected Chinese/empty and removed them in the actual Windows main list. Operator observed only hello, 37 B, in Mac consent, accepted and observed `6a507a32…` complete. Received `(4)` matched the original SHA-256; pre-test files stayed unchanged and no staging remained. Tester confirmed Windows complete, Clear list empties the list/disables Send files, and all three Windows originals remain. Windows UI/filesystem statements are tester reports. |
 | Physical collision protection | The direct-send retry saved `01 Mac hello (2).txt`, 37 B, matching the original SHA-256. Hashes of the existing original and deliberately different `(1)` sentinel were unchanged; no `.lanbridge-*` staging directory remained. |
 
 ![Finder selection on the real Mac](images/mac-m7/02-finder-selection.jpg)
@@ -146,6 +153,12 @@ The `c863854` CI completed all six jobs successfully, including both native
 builds and frozen diagnostics. Inspected Python 3.12 logs: Windows **76 passed,
 1 native macOS test skipped**; Mac **76 passed, 1 Windows COM test skipped**.
 The startup-order follow-up `f530938` CI also completed all six jobs successfully; its Python 3.12 logs each show **76 passed, 1 platform-specific skip**.
+The editable-selection `597e8a3` CI also passed all six jobs, including both
+frozen builds. Inspected Python 3.12 logs on Windows and Mac each show **78 passed,
+1 platform-specific skip**. Selection tests additionally validate source-file
+preservation, removal of the correct same-basename path, keyboard removal and
+independence from an already-started send.
+
 The right-click tests cover explicit authenticated IPC send intent, single/multi
 recipient dispatch, unpaired/offline/revoked targets, empty selections and actual
 paired TLS consent without opening the sender main window. Isolated two-process accept

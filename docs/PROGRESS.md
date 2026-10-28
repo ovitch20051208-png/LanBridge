@@ -465,5 +465,15 @@ Only hello/empty, 37 B, were sent (`e013fda5…`, complete on Mac); the Windows
 tester confirmed the two-file incoming list and receipt. Original SHA-256 values
 of all three source files remained unchanged. Actual Clear list emptied the
 view and disabled Send files/Clear list. Screenshots 26–27 document this phase.
-`597e8a3` CI's four test jobs and native Mac build passed; Windows build and
-physical editable-list validation are recorded separately when available.
+`597e8a3` CI run 40669476207 passed all six jobs, including both native builds and frozen diagnostics. Windows and Mac Python 3.12 logs each show **78 passed, 1 platform-specific skip**. The verified Windows package was delivered for its physical editable-list check.
+
+Updated Windows `597e8a3` editable-selection validation passed by tester report
+and observed Mac transfer: the tester removed Chinese/empty via Ctrl multi-select
+and Remove selected, then sent only hello. Actual Mac consent contained just
+that 37 B file; `6a507a32…` completed and its `(4)` collision file matched the
+original SHA-256. Pre-test Mac files stayed unchanged with no staging residue.
+Tester confirmed Windows complete, Clear list emptied the view/disabled Send
+files and all three Windows source files still existed. The final package's
+four test jobs and two native builds/frozen diagnostics passed. Mac is running
+the same clean arm64 module from Applications; the final test selection was
+cleared, retaining completed transfer history.
