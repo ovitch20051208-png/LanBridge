@@ -136,6 +136,42 @@ verified and delivered for physical validation as `LanBridge-Windows-597e8a3.zip
 
 ![Successful real transfer after receiver force-kill and restart](images/mac-m7/25-post-crash-recovery.jpg)
 
+## Windows Wi-Fi interruption and recovery — 2026-10-28
+
+Both installed apps use clean `597e8a3`. Windows networking/UI/filesystem actions
+below are tester reports; the Mac operator observes the native Mac UI and its
+local files/processes. No firewall or TLS/pairing/consent settings were changed.
+The original Mac app process is PID 51515.
+
+- **Receiver Wi-Fi off:** Mac offered the newly named `network drop 4 GiB.bin`,
+  4,294,967,296 bytes. Actual payload progress was observed beyond 74.5 MiB.
+  After the tester accepted and disabled Windows Wi-Fi, Mac request `54462c84…`
+  became `error: [Errno 32] Broken pipe` at approximately 2%, never complete.
+  The transfer TCP connection closed while the Mac receive listeners stayed up.
+  The tester reported `Receive 54462c84 error`, no new final file and no hidden
+  staging remnants, then restored Wi-Fi without restarting LanBridge.
+- **Same-file retry:** Mac started a new request `bfeeff85…` from 0 B without
+  restarting or re-pairing. The tester accepted it. Mac observed complete at 4.0/4.0 GiB, average 20.7 MiB/s;
+  the tester confirmed Windows complete and normal receipt. Windows PowerShell
+  Get-FileHash returned the exact source SHA-256, and the tester separately
+  confirmed no hidden staging remnants after the completed retry.
+- **Local baseline:** the Mac receive-folder inventory, sizes and mtimes stayed
+  unchanged through the interrupted send. No Mac staging directories appeared.
+  No new application-log entries, including the earlier asyncio traceback,
+  appeared during the interruption; this does not resolve the older Quit case.
+- **Related isolated regression check:** six existing disconnect/cancellation/
+  restart-cleanup tests passed. They use separate identities/directories and do
+  not stand in for these two-computer observations.
+
+The large source's streaming SHA-256 was verified before the test:
+`8479e43911dc45e89f934fe48d01297e16f51d17aa561d4d1c216b1ae0fcddca`.
+
+![Real payload progress before receiver Wi-Fi interruption](images/mac-m7/28-network-outage-progress.jpg)
+
+![Mac reports the interrupted connection as failure](images/mac-m7/29-network-outage-error.jpg)
+
+![Same-file retry completes after Windows Wi-Fi returns](images/mac-m7/30-network-retry-complete.jpg)
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |
@@ -174,7 +210,7 @@ identities/configuration and do not replace the physical checks above.
 - Developer ID/notarization and Windows publisher signing remain unperformed.
   This Mac has no valid signing identity; notarytool is available.
 - Three-physical-computer recipient selection, first-pairing Decline/revocation,
-  Wi-Fi toggling, Windows receiver force-kill/restart cleanup, low disk/read-only receive
+  Wi-Fi interruption with Windows sending, Windows receiver force-kill/restart cleanup, low disk/read-only receive
   folders and the full manual edge-case checklist are not yet signed off.
 - At 21:37 UTC during forced Windows receiver Quit, one non-fatal asyncio
   `_call_connection_lost` traceback was logged after the correct Connection lost

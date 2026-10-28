@@ -477,3 +477,23 @@ files and all three Windows source files still existed. The final package's
 four test jobs and two native builds/frozen diagnostics passed. Mac is running
 the same clean arm64 module from Applications; the final test selection was
 cleared, retaining completed transfer history.
+
+## M7 continuation — Windows receiver Wi-Fi interruption — 2026-10-28
+
+Both apps remained on clean `597e8a3`. A generated, newly named 4 GiB source's
+streaming SHA-256 was verified before sending. During `54462c84…`, real payload
+progress passed 74.5 MiB, then the tester disabled Windows Wi-Fi. Mac failed with
+Broken pipe at about 2%, never complete; Windows reported Receive error and no
+final/staging remnants. The tester restored Wi-Fi without restarting LanBridge.
+A new same-file request `bfeeff85…` started from 0 B and completed on Mac at
+4.0/4.0 GiB, average 20.7 MiB/s. Windows reported complete, no staging remnants,
+and independently ran PowerShell Get-FileHash: the resulting SHA-256 exactly
+matched the source `8479e439…fcddca`.
+
+Mac PID 51515 and listeners persisted throughout; its pre-test receive inventory,
+sizes and mtimes were unchanged. No new app-log entries appeared during this
+run, so the prior Quit-specific asyncio issue was not reproduced or declared
+resolved. Six related isolated disconnect/cancel/restart-cleanup tests passed.
+Native screenshots 28–30 show payload, failure and successful retry. Reverse-role
+Wi-Fi interruption remains a separate check. No code/security setting changes
+were needed for this phase.

@@ -393,7 +393,7 @@ If the receiver restarts, check the current endpoint values again.
 | `verifying` or 100% | Wait for `complete`; the receiver has to validate and acknowledge. |
 | Destination file not obvious | Use **Received Files** and check Settings; look for numeric collision suffixes. |
 | Receiver unexpectedly quits | Reopen its installed app; incomplete temporary data is cleaned on startup and complete files remain. Retry from the start and accept the new request. If Finder shows a Run Shell Script error after force-quitting an action-launched app, dismiss it with OK before reopening. |
-| Disconnect / cancel | Retry from the start; inspect the destination first if the final receipt might have been lost. |
+| Disconnect / cancel | Reconnect to the LAN, keep both apps running and check Paired, then send again and Accept the new request. Transfers restart from the beginning. Inspect the destination first if the final receipt might have been lost. |
 | Unsafe filename / folder rejected | Select files, not folders; rename to a portable filename or make a ZIP yourself. |
 | Cannot write destination / insufficient space | Choose a writable folder in Settings and free enough disk space. |
 | Old device name | Quit/restart after saving a name; pairing records may keep their earlier saved name. |

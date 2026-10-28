@@ -78,3 +78,13 @@ Images 26–27 use clean `597e8a3` on the same M3:
 - `27-remaining-files-complete.jpg`: after removing that entry, only hello/empty
   remain and their 37 B physical transfer completed; Windows tester confirmed
   exactly those two incoming files and receipt. Source-file hashes were unchanged.
+
+Images 28–30 use clean `597e8a3` on 2026-10-28 for physical Windows receiver
+Wi-Fi interruption/recovery:
+
+- `28-network-outage-progress.jpg`: actual payload progress (74.0 MiB); the
+  immediately following AX observation recorded 74.5 MiB.
+- `29-network-outage-error.jpg`: Mac sender failed with Broken pipe at about 2%
+  after the tester disabled Windows Wi-Fi, never reporting complete.
+- `30-network-retry-complete.jpg`: same file fully retransmitted after Wi-Fi was
+  restored, without restarting/re-pairing. Windows tester also confirmed receipt.
