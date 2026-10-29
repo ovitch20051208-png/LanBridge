@@ -426,6 +426,50 @@ integration remain separate; the rest of M7 is not signed off by this result.
 
 ![Finder retry completes after Windows ACL and settings recovery](images/mac-m7/43-windows-acl-recovery-complete.jpg)
 
+## Fixed-build reverse, Decline and payload-cancel regression — 2026-10-29
+
+Both apps kept the same fix builds. Windows selected the paired Mac after
+Choose files; the owner reported that unselected target / disabled-button feedback
+was unclear among Smoke test entries. UX-001 was recorded for M9 without changing
+UI behavior. Independent Mac mDNS queries resolved only the real Mac/Windows;
+no Mac smoke-test process was running. Windows list contents are tester reports.
+
+- **Reverse with hidden Mac window:** Windows sent `01 Mac hello (4).txt`.
+  Operator observed the standalone Incoming files dialog and clicked Accept.
+  `42a0dbbe…` completed at 37/37 B; tester confirmed Windows complete. Actual Mac
+  output `01 Mac hello (4) (1).txt` matched the source/Windows SHA-256. All ten
+  earlier files retained sizes/mtimes and small-file hashes, with no staging.
+  Finder double-click restored the same app/window with the outgoing selection
+  retained and no new send; completion archived to Ready, Mac PID still 66956.
+- **Explicit Decline:** another Windows offer was declined on Mac.
+  `6b9cf5c0…` showed declined at 0/37 B; tester confirmed Windows declined.
+  All eleven Mac files retained sizes/mtimes and small-file hashes; no staging.
+- **Cancel after real payload:** Mac offered generated `staging fix cancel 4 GiB.bin`,
+  4,294,967,296 B, SHA-256 matching the existing generated 4 GiB reference.
+  Tester Accepted `489df12f…`. Actual payload was observed, including 410.2 MiB
+  in AX immediately before cancellation. Mac operator cancelled; terminal UI
+  reported Cancelled / 519.5 MiB sent, never complete. Tester reported Windows
+  Sender disconnected before completion, with no matching final file or hidden
+  staging. Mac original eleven files and large source hash remained unchanged.
+  Task archived, send list cleared and Ready restored. A pre-existing 13:01
+  zeroconf warning predates this 16:14 app start; no new Mac log entry appeared
+  during this regression. The older teardown issue is not declared resolved.
+
+These affected physical regressions pass. Source review, native Windows/Mac checks,
+frozen diagnostics and the full 7A-1 recovery gate support integrating the fix;
+main integration/its exact CI result is recorded separately. Windows low-space,
+receiver force-kill, remaining M7/trust/multi-device and M8/M9/M10 gates remain open.
+
+![Incoming confirmation while the fixed Mac main window is hidden](images/mac-m7/44-fixed-build-hidden-incoming.jpg)
+
+![Fixed Mac completes the reverse transfer](images/mac-m7/45-fixed-build-reverse-complete.jpg)
+
+![Explicit Decline retains zero payload](images/mac-m7/46-fixed-build-declined.jpg)
+
+![Real payload before cancellation](images/mac-m7/47-fixed-build-cancel-progress.jpg)
+
+![Cancelled task records actual sent bytes](images/mac-m7/48-fixed-build-cancelled.jpg)
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |
@@ -437,7 +481,7 @@ integration remain separate; the rest of M7 is not signed off by this result.
 
 ## Automated checks
 
-Latest full Mac gate after timeout/terminal-history corrections: documentation, lint/format, **83 passed, 1 Windows COM test
+At the timeout/terminal-history checkpoint, the full Mac gate passed documentation, lint/format, **83 passed, 1 Windows COM test
 skipped**. Native Cocoa reopening/file-manager/desktop/history modules: **28 passed**.
 The `c863854` CI completed all six jobs successfully, including both native
 builds and frozen diagnostics. Inspected Python 3.12 logs: Windows **76 passed,
@@ -470,7 +514,7 @@ and evidence only; the CI workflow excludes docs-only pushes.
 - Developer ID/notarization and Windows publisher signing remain unperformed.
   This Mac has no valid signing identity; notarytool is available.
 - Three-physical-computer recipient selection, first-pairing Decline/revocation,
-  Windows receiver force-kill/restart cleanup, Windows receive-storage faults,
+  Windows receiver force-kill/restart cleanup, Windows preflight low-space rejection,
   mid-transfer disk exhaustion and the full manual edge-case checklist are not
   yet signed off. Mac preflight low-space rejection is verified above.
 - The owner reports a third Windows computer is available. The explicit

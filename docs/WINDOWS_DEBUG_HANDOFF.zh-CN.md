@@ -1,6 +1,6 @@
 # M7 / 7A Windows 接收权限卡住：本机诊断交接
 
-更新于 2026-10-29。**7A-1 真实双机权限拒绝、持续服务、恢复后重传及落盘哈希已通过**，
+更新于 2026-10-29。**7A-1 及受影响的反向/拒绝/载荷取消回归均已通过，待合入 main**，
 不进入 UI/UX 改版。原始现场保留，最新结果见“Windows 本机接手结果”和“Mac 接手实机复测”。
 项目：`https://github.com/ovitch20051208-png/LanBridge`。
 先读 [阶段规划](ROADMAP.zh-CN.md)、[实机证据](M7_ACCEPTANCE.md)、
@@ -227,3 +227,17 @@ Mac PID 66956 通过实际 Finder 右键直发 `4f94568e…`，Windows Accept �
 Windows PowerShell 独立核对新文件 `01 Mac hello (4).txt`，37 B 原件哈希完全一致，
 无暂存；Mac 原文件、身份/信任/设置不变，已归档回到 Ready。
 7A-1 权限与恢复闭环通过；合并前继续受影响的反向、Decline、取消回归，不开始其他阶段。
+
+## 受影响双机回归通过 — 2026-10-29
+
+- `42a0dbbe…`：Windows 发给主窗口隐藏的 Mac；操作员在独立弹窗 Accept，双方
+  complete，Mac 新文件 `01 Mac hello (4) (1).txt` 哈希与原件一致，无暂存、原文件保留。
+  Finder 普通重开仍为 PID 66956，保留选择、不自动发送，完成任务归档回到 Ready。
+- `6b9cf5c0…`：Mac 实际 Decline，双方 declined、0 B，Mac 十一个文件不变、无暂存。
+- `489df12f…`：Mac 发生成的 4 GiB 新名称测试文件，Windows Accept。实际载荷通过
+  410.2 MiB 后由 Mac 取消，终态记录 519.5 MiB / Cancelled。Windows 报
+  Sender disconnected before completion，所有者确认没有最终文件/暂存残留。
+  Mac 原文件、大文件源哈希、配置/身份/信任不变；归档并清空发送列表，保留源文件。
+
+功能修复现已具备合并前证据。Windows 低空间/强制退出等剩余测试不在本轮签字范围；
+UX-001 已另行记录，当前没有做 UI/UX 改版。

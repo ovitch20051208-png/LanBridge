@@ -148,3 +148,17 @@ tester-confirmed clean `671a79e`:
   without restarting either app. Tester confirmed Windows complete, saved `(4)`,
   independently matching PowerShell SHA-256 and no staging. Mac later archived
   to Ready; source and earlier receive files stayed unchanged.
+
+Images 44–48 use the same clean `30fb3bf` Mac and tester-confirmed `671a79e` Windows:
+
+- `44-fixed-build-hidden-incoming.jpg`: actual standalone Mac consent dialog,
+  main window hidden, correct 37 B file and normal receive destination.
+- `45-fixed-build-reverse-complete.jpg`: operator Accepted; reverse task complete.
+  Actual output hash matched the source, earlier files preserved, no staging.
+- `46-fixed-build-declined.jpg`: operator Declined another offer, 0/37 B. Tester
+  confirmed Windows declined; Mac inventory/hashes unchanged, no staging.
+- `47-fixed-build-cancel-progress.jpg`: actual 4 GiB payload, screenshot 409.8 MiB;
+  following AX observation 410.2 MiB. This is a cancellation test, not full receipt.
+- `48-fixed-build-cancelled.jpg`: after operator cancellation, terminal count
+  519.5 MiB, Cancelled. Tester reported Windows sender-disconnected error and no
+  final/staging remnants. Task later archived and selection cleared to Ready.

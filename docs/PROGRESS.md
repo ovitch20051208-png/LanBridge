@@ -757,3 +757,26 @@ paired Mac enabled the real reverse offer. Added UX-001 to the
 [UI/UX backlog](UI_UX_BACKLOG.zh-CN.md): clearer target selection, current target
 and disabled-state explanation, with design deferred to M9. No UI behavior or
 automatic selection was changed. This is a design record, not a new test pass.
+
+## M7 / 7A-1 — affected physical regressions pass — 2026-10-29
+
+On the same fix builds, Windows sent the verified hello to the hidden Mac main
+window. Operator Accepted the standalone dialog; `42a0dbbe…` completed, tester
+confirmed Windows complete, and the Mac `(4) (1)` collision output matched the
+source/Windows hash. Original ten files stayed unchanged; no staging. Actual
+Finder double-click reopened the same PID/window without sending, then archive
+returned Ready. Next `6b9cf5c0…` was explicitly Declined on Mac, declined on Windows
+by tester confirmation, 0 B, with all eleven files preserved and no staging.
+
+Generated 4 GiB `489df12f…` was Accepted on Windows; real payload passed 410.2 MiB
+before operator cancellation. Mac terminal UI recorded Cancelled / 519.5 MiB
+transferred; Windows reported Sender disconnected before completion. Tester
+confirmed no new final file or staging. Mac files, source hash, settings and
+identity/trust hashes stayed unchanged, PID 66956; archived and cleared list to
+Ready. Screenshots 44–48 record incoming/success/Decline/progress/cancel. No new
+Mac log entries during this run; the older teardown issue remains separate.
+
+The fix is ready for main integration following review, local/native automated
+checks, frozen diagnostics and physical 7A-1 plus affected regressions. Remaining
+Windows storage/force-kill, M7 trust/three-host, installation/login and signing
+are not inferred from these results.
