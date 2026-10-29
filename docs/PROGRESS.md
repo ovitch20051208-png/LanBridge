@@ -748,3 +748,12 @@ staging in either Windows folder. Mac original ten files/settings/identity/trust
 hashes stayed unchanged; completion archived to Ready. Screenshot 43 captures
 Mac completion. 7A-1's full permission/recovery gate passes; reverse/Decline/cancel
 regression and main integration are next, before the remaining M7 rounds.
+
+## M9 design note captured during M7 — 2026-10-29
+
+Owner reported Choose files left Send files disabled until selecting the Mac row;
+two Smoke test entries made recipient selection less obvious. Selecting the
+paired Mac enabled the real reverse offer. Added UX-001 to the
+[UI/UX backlog](UI_UX_BACKLOG.zh-CN.md): clearer target selection, current target
+and disabled-state explanation, with design deferred to M9. No UI behavior or
+automatic selection was changed. This is a design record, not a new test pass.

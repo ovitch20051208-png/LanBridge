@@ -110,6 +110,9 @@ Windows。开测前核对 C 的 Windows 11 x86-64、准确应用版本及同一�
 
 ## M9：UI/UX 分支与回归约束
 
+所有者提出的具体体验问题记录在 [UI/UX 待设计清单](UI_UX_BACKLOG.zh-CN.md)，
+当前包含 UX-001：选文件后目标选择及 Send files 禁用原因不清楚；M9 再确定设计。
+
 拟用分支：`uiux/desktop-redesign`，进入 M9 时从 M8 的 tag 创建。
 改版期间 `main` 保留已验收功能基线。每个独立 UI 模块验证后建立清晰 commit，
 **立即推送到 UI 分支**；最后整体验收后才合并到 `main`。

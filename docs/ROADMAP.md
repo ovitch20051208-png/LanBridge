@@ -135,6 +135,10 @@ after M8 passes; today's app is not prematurely labeled frozen.
 
 ## M9 branch and regression contract
 
+Owner-reported design work is tracked in the [UI/UX backlog](UI_UX_BACKLOG.zh-CN.md),
+starting with unclear target selection/disabled Send files feedback after choosing
+files. Its design remains for M9; current behavior is unchanged.
+
 Create proposed branch `uiux/desktop-redesign` from the M8 tag when M9 begins.
 Keep `main` at the accepted functional baseline during UI review. Commit each
 validated UI module clearly and push immediately to the UI branch. First extend
