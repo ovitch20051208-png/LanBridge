@@ -1,6 +1,6 @@
 # M7 / 7A Windows 接收权限卡住：本机诊断交接
 
-更新于 2026-10-29。**7A-1 及受影响的反向/拒绝/载荷取消回归均已通过，待合入 main**，
+更新于 2026-10-29。**7A-1 及受影响回归均通过，修复已合入 main，main CI 六项全通过**，
 不进入 UI/UX 改版。原始现场保留，最新结果见“Windows 本机接手结果”和“Mac 接手实机复测”。
 项目：`https://github.com/ovitch20051208-png/LanBridge`。
 先读 [阶段规划](ROADMAP.zh-CN.md)、[实机证据](M7_ACCEPTANCE.md)、
@@ -241,3 +241,18 @@ Windows PowerShell 独立核对新文件 `01 Mac hello (4).txt`，37 B 原件哈
 
 功能修复现已具备合并前证据。Windows 低空间/强制退出等剩余测试不在本轮签字范围；
 UX-001 已另行记录，当前没有做 UI/UX 改版。
+
+## main 集成完成 — 2026-10-29
+
+Mac 完成复核与实机回归后，保留完整历史，将 main 从 `e714f2f` fast-forward 至
+`1d2804b795ceec1e664d555329aa0aa0f56b7495`，修复分支保留，未 force-push。
+该 SHA 的 [CI 40914669452](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40914669452)
+已完成且六项任务全部成功。检查 Python 3.12 日志：Windows 88 passed / 1 skip，
+Mac 87 passed / 2 skips；检查两端构建日志：冻结程序 Qt 弹窗 passed、真实 TLS complete。
+Mac 本机全量同为 87 passed / 2 Windows-only skips。
+
+当前受测安装包仍为 Mac 干净 `30fb3bf`、Windows 干净 `671a79e`；已用 Git 核对它们
+与集成后 main 的 `lanbridge/` 运行源码一致。后续验收文档提交不要求重复换包。
+Mac 最终为原 PID 66956、Ready、空发送列表，正常接收配置和身份/信任保持。
+Windows 正常目录与测试目录权限均已恢复，备份保留。剩余 7A 低空间/强制结束、
+7B–7E、安装/登录和发行签名继续按阶段规划执行，不由此推断通过。

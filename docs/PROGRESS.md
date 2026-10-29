@@ -780,3 +780,21 @@ The fix is ready for main integration following review, local/native automated
 checks, frozen diagnostics and physical 7A-1 plus affected regressions. Remaining
 Windows storage/force-kill, M7 trust/three-host, installation/login and signing
 are not inferred from these results.
+
+## M7 / 7A-1 — integrated main and observed CI — 2026-10-29
+
+Preserving the full Windows/Mac commit history, main was fast-forwarded from
+`e714f2f` to `1d2804b795ceec1e664d555329aa0aa0f56b7495`. The fix branch remains.
+[Run 40914669452](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40914669452)
+finished success, all six test/native-build jobs. Inspected 3.12 logs show Windows
+88 passed / 1 macOS skip, Mac 87 passed / 2 Windows-only skips. Both frozen native
+diagnostic logs confirm Qt dialog passed and TLS complete. Local full gate also
+passed 87 tests / 2 Windows-only skips, documentation/lint/format.
+
+Git confirmed the tested Mac `30fb3bf` / Windows `671a79e` runtime code matches
+integrated main; these apps remain the installed acceptance builds. Mac is left
+Ready with an empty send list, same PID 66956 and original settings/identity/trust.
+Windows test ACL and normal receive settings are restored, backup retained.
+7A-1 and affected regression are complete. Remaining 7A faults, trust/three-host,
+clean install/login, M9 design and signing remain pending. This final record is
+docs-only and excluded from CI; the run above identifies its tested code checkpoint.

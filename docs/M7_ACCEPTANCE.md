@@ -506,6 +506,25 @@ The October 29 storage-recovery full Mac gate also passed documentation,
 lint/format and **83 tests, 1 Windows COM skip**. This phase changes documentation
 and evidence only; the CI workflow excludes docs-only pushes.
 
+## ACL fix integrated into main — 2026-10-29
+
+After physical and source review, main fast-forwarded from `e714f2f` to
+`1d2804b795ceec1e664d555329aa0aa0f56b7495`, preserving Windows and Mac commits
+and the fix branch. [CI 40914669452](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40914669452)
+completed successfully: all four Windows/macOS Python 3.12/3.13 test jobs and
+both native builds passed. Inspected Python 3.12 logs: Windows **88 passed,
+1 macOS skip**; Mac **87 passed, 2 Windows skips**. Both actual frozen build logs
+report Qt dialog passed and TLS transfer complete. Final local full gate also
+passed documentation/lint/format and **87 tests, 2 Windows-only skips**.
+
+Installed Mac `30fb3bf` and Windows `671a79e` retain their clean manifests; Git
+comparison confirmed their runtime source matches integrated main. Subsequent
+evidence-only commits do not mean new binaries. Mac remains PID 66956, Ready,
+send list empty, normal receive settings/identity/trust preserved. Windows DACL
+and normal receive path were restored with the backup retained. This closes the
+ACL hang fix/recovery regression, not all M7 or release gates. UX-001 remains a
+future [M9 design item](UI_UX_BACKLOG.zh-CN.md).
+
 ## Remaining checks and one observed runtime log issue
 
 - Fresh non-administrator/clean-system installation, downloaded-app quarantine

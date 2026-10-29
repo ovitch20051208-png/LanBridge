@@ -14,9 +14,12 @@ changes sequencing, not application behavior or verification results.
   Finder/Windows direct send, reopening, editable file selection and failure
   archiving passed within the scopes recorded in the evidence.
 - Mac receive permission-denial, preflight low-space rejection and recovery
-  passed. Corresponding Windows receiver storage cases remain unverified.
-- Installed app: clean `ec981af`; latest Mac full gate: 83 passed, 1 Windows COM
-  skip. Its six CI jobs passed. Later docs commits do not imply newer app packages.
+  passed. Windows ACL failure/recovery and affected regressions now pass; Windows
+  low-space and receiver force-kill remain unverified.
+- Installed clean builds: Mac `30fb3bf`, Windows `671a79e`; identical runtime fix
+  integrated into main at `1d2804b`. Latest Mac gate: 87 passed, 2 Windows skips;
+  Windows Python 3.12 CI: 88 passed, 1 Mac skip. All six main CI jobs passed.
+  Later docs commits do not imply newer installed packages.
 - Fresh installation, actual login startup, remaining edge cases and signing
   are open. No UI/UX branch or baseline tag has been created.
 
@@ -54,11 +57,12 @@ cases stay pending; a deferral needs explicit
 owner acceptance and a record, never a false pass. Windows results require the
 owner's observation; Mac automation cannot certify them.
 
-Round 7A-1's Windows ACL hang is fixed on the working branch. Native regression
+Round 7A-1's Windows ACL hang fix is integrated into main. Native regression
 and two real accepted offers return prompt permission failures, with continued
 service and no remnants. ACL/settings restoration and a same-process Finder retry
-with an independently matching Windows hash now pass. Affected reverse/Decline/
-cancel regression and main integration follow; see the [handoff](WINDOWS_DEBUG_HANDOFF.zh-CN.md).
+with an independently matching Windows hash now pass, as do reverse/Decline/
+payload-cancel regressions. Round 7A continues with Windows low-space and receiver
+force-kill tests; see the [handoff](WINDOWS_DEBUG_HANDOFF.zh-CN.md).
 
 Windows setup is guided one action at a time: restrict only a newly created
 fixture directory and use an owned small VHD for space tests. Record the original
