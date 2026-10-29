@@ -318,6 +318,57 @@ restoration remains pending and the outside backup is retained.
 
 ![Sender timeout after the tester accepted the Windows ACL test](images/mac-m7/40-windows-acl-accept-timeout.jpg)
 
+### Windows-native diagnosis and branch correction — 2026-10-29
+
+The Windows operator used the native x64 Python 3.12.10 on Windows 11 / NTFS,
+under the same interactive-user SID as the denied ACL, without elevation.
+Only new isolated directories and identities were used for automated reproduction.
+Real mkdir failed with errno 13 / WinError 5 while `os.access(W_OK)` returned
+True. Unmodified `tempfile.mkdtemp` made over 10,000 real mkdir attempts within
+the two-second child limit. A separate real TLS receiver reproduction reached
+consent, then its faulthandler stack showed `_handle → tempfile.mkdtemp`; the
+parent killed it at 12 seconds. Even its in-loop timeout could not run.
+This confirms the candidate through NTFS and the actual receive service path;
+it is not a captured stack from the owner's previously running frozen process.
+
+Fix `671a79ed81a6705655bab2073ebf46c6a1b8517b` was checked and immediately
+pushed to `fix/windows-staging-denied`. A random 128-bit suffix plus atomic
+private-mode mkdir now retries only genuine FileExistsError, at most ten times.
+Other storage errors immediately enter the existing failure/receipt path.
+TLS, exact pins, bilateral pairing, per-offer consent and staging ownership/
+cleanup remain intact. No UI/UX work or merge to main was performed.
+
+After the fix, the bounded native TLS regression accepted two successive offers
+into the denied directory: both peers failed with a nonempty WinError 5 at 0 B
+within 0.02 seconds, without final content/staging. The same receiver then
+completed a fresh, separately accepted transfer after ACL restoration, without
+restart/re-pairing; its collision-suffixed file matched the source hash and the
+existing sentinel stayed unchanged. Collision/exhaustion and direct permission/
+ENOSPC propagation tests also passed. Windows full gate: **88 passed, 1 native
+macOS skip**; explicit complete/decline two-process demos and live mDNS passed.
+
+A separate clean worktree produced the Windows AMD64 / Python 3.12.10 / Qt
+6.12.0 package with that exact commit and `source_dirty=false`. Frozen diagnostics
+outside the checkout passed both Qt consent and TLS completion. Local ZIP SHA-256:
+`ec89e7c34166d82b2f44d45f4491c423b3bab243391d2513a7239c0f16d12fb6`.
+Existing untracked binaries were preserved. The existing workflow was manually
+dispatched for the fix SHA as
+[run 40907015423](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40907015423);
+all six test/build jobs succeeded. Inspected Python 3.12 logs show Windows
+88 passed / 1 macOS skip and Mac 87 passed / 2 Windows-only skips. Both frozen
+build logs show Qt consent passed and TLS complete. Branch pushes alone do not
+trigger the current workflow.
+
+The real Windows app now runs that clean fix package with its original trust
+and configuration. Its permission-test directory deliberately remains denied
+and empty, with the original outside ACL backup retained for the next physical
+Mac offer. **The two-computer 7A-1 gate is still pending**: actual Accept must
+fail promptly on both desktops, a second offer must remain serviceable, then
+restore ACL/settings and verify a real successful retry with the known source
+hash. The [updated native handoff](WINDOWS_DEBUG_HANDOFF.zh-CN.md) includes the
+tested non-admin DACL restoration alternative if icacls /restore returns 1300.
+Automated native acceptance is not physical Mac ↔ Windows sign-off.
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |

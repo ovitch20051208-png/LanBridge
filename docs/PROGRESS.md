@@ -660,3 +660,56 @@ at handoff; its backup must be retained until restoration is verified.
 Handoff checkpoint gate: documentation (17 Markdown files, 232 local links,
 41 images), lint/format and **83 passed, 1 Windows COM skip**. These checks do
 not resolve the physical ACL failure. This docs-only commit is excluded from CI.
+
+## M7 / 7A — native Windows root cause and minimal fix — 2026-10-29
+
+Windows-local takeover safely fetched main at e714f2f and created
+`fix/windows-staging-denied`, preserving the user's untracked EXE/_internal.
+Windows 11 x64, NTFS, native x64 Python 3.12.10, same interactive SID and a
+standard non-admin token were recorded. The old frozen app's PID/listeners,
+settings, logs, denied ACL and outside backup were inspected without reading
+private keys, IPC tokens or full user configuration.
+
+New isolated NTFS reproduction confirmed mkdir returns PermissionError /
+WinError 5 while os.access reports writable. Original tempfile.mkdtemp retried
+over 10,000 times in a two-second child. A bounded real TLS receiver test also
+hung after consent; its four-second faulthandler stack showed
+`TransferServer._handle → tempfile.mkdtemp`. The parent killed the child at 12
+seconds and restored the test ACL. This confirms the cause in the actual
+receiver path; no old live-process stack capture is claimed.
+
+Fix **671a79ed81a6705655bab2073ebf46c6a1b8517b** was immediately committed and
+pushed after the full Windows gate (**88 passed, 1 macOS-only skip**, docs/lint/
+format passed). Staging now uses unpredictable 128-bit names and atomic mkdir,
+with only FileExistsError retried, at most ten times. Permission/space errors
+propagate to existing failure receipts. Prefix/owner marker/private modes and
+cleanup, TLS, pins, pairing and explicit per-offer consent are preserved.
+
+The new native regression failed against the original source at its hard limit;
+with the fix, two denied TLS offers failed on both peers at 0 B within 0.02 s,
+with no final content/staging and unchanged existing sentinel. ACL restoration
+allowed a third separately accepted request to complete in the same server,
+without restart/re-pairing, with matching hash and collision-safe publication.
+Bounded collision and permission/ENOSPC propagation checks passed. Independent
+two-peer complete/decline demos and live mDNS smoke also passed.
+
+Clean detached worktree build: exact fix SHA, source_dirty=false, AMD64 / Python
+3.12.10 / Qt 6.12.0; actual frozen Qt/TLS diagnostics outside the checkout passed.
+Local ZIP `dist/LanBridge-windows-x86_64-671a79e.zip` SHA-256:
+`ec89e7c34166d82b2f44d45f4491c423b3bab243391d2513a7239c0f16d12fb6`.
+The original-workspace build was correctly marked dirty by existing untracked
+binaries, so the clean rebuild is the acceptance candidate.
+Existing CI was manually dispatched for the fix SHA as
+[run 40907015423](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40907015423).
+All six test/build jobs succeeded. Inspected Python 3.12 logs: Windows 88 passed /
+1 skip; Mac 87 passed / 2 Windows-only skips. Both native build logs show actual
+frozen Qt consent passed and TLS complete.
+
+The actual Windows app was switched to the clean fix with original trust/state;
+only the path-verified old idle LanBridge test process was stopped. Ready and the
+original Mac Online / Paired were observed. The original permission-test folder
+is intentionally still denied and empty, with backup preserved, ready for Mac
+manual testing. A DACL-only backup restore was separately verified on a new
+directory with the same non-admin token, because icacls /restore returns 1300
+in this token. Physical failure/retry/hash and Mac cross-platform review remain
+pending; no 7A-1 pass, main merge, baseline freeze or UI/UX start is claimed.

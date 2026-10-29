@@ -1,6 +1,7 @@
 # M7 / 7A Windows 接收权限卡住：本机诊断交接
 
-更新于 2026-10-29。当前是**已发现、尚未修复的功能 Bug**，不进入 UI/UX 改版。
+更新于 2026-10-29。**Windows 原生根因已确认，最小修复已推送分支；真实双机验收仍待执行**，
+不进入 UI/UX 改版。下文的原始现场保留，最新结果见“Windows 本机接手结果”。
 项目：`https://github.com/ovitch20051208-png/LanBridge`。
 先读 [阶段规划](ROADMAP.zh-CN.md)、[实机证据](M7_ACCEPTANCE.md)、
 [安全设计](SECURITY.md)、[开发流程](DEVELOPMENT.md)及本机适用的 AGENTS.md。
@@ -95,7 +96,110 @@ Mac 上的隔离行为模型复现了连续四次 PermissionError 后继续重�
 icacls.exe 'C:\Users\ovitc\Desktop' /restore 'C:\Users\ovitc\Desktop\LanBridge Permission Test.acl'
 ```
 
+本次标准非管理员诊断令牌在**新建隔离目录**上执行 `icacls /restore` 返回 1300
+（Not all privileges or groups referenced are assigned to the caller），连未修改 ACL 的
+备份恢复也会如此；不要因此提权或扩大权限。可仅从已保存备份恢复该唯一目录的 DACL：
+
+```powershell
+$permissionTestPath = 'C:\Users\ovitc\Desktop\LanBridge Permission Test'
+$permissionAclBackup = 'C:\Users\ovitc\Desktop\LanBridge Permission Test.acl'
+$savedAclLines = @(Get-Content -LiteralPath $permissionAclBackup -Encoding Unicode |
+    Where-Object { $_.Trim() })
+if ($savedAclLines.Count -ne 2 -or
+    [string]$savedAclLines[0] -ne (Split-Path -Leaf $permissionTestPath)) {
+    throw '备份不只包含预期测试目录；停止恢复'
+}
+$accessSection = [System.Security.AccessControl.AccessControlSections]::Access
+$restoredAcl = Get-Acl -LiteralPath $permissionTestPath
+$restoredAcl.SetSecurityDescriptorSddlForm([string]$savedAclLines[1], $accessSection)
+Set-Acl -LiteralPath $permissionTestPath -AclObject $restoredAcl -ErrorAction Stop
+$expectedAcl = New-Object System.Security.AccessControl.DirectorySecurity
+$expectedAcl.SetSecurityDescriptorSddlForm([string]$savedAclLines[1], $accessSection)
+$actualAcl = Get-Acl -LiteralPath $permissionTestPath
+# Windows 可重新标注 AI/AR 元数据；比较每条 ACE 和继承保护状态。
+$actualRules = [regex]::Replace(
+    $actualAcl.GetSecurityDescriptorSddlForm($accessSection), '^D:[^(]*', 'D:')
+$expectedRules = [regex]::Replace(
+    $expectedAcl.GetSecurityDescriptorSddlForm($accessSection), '^D:[^(]*', 'D:')
+if ($actualRules -ne $expectedRules -or
+    $actualAcl.AreAccessRulesProtected -ne $expectedAcl.AreAccessRulesProtected) {
+    throw '恢复后的 DACL 与备份不一致'
+}
+```
+
+此替代步骤已在新建隔离目录以同一非管理员令牌验证，并将真实备份仅应用到仓库内新建
+探针目录：恢复后的每条访问规则和继承保护状态均与备份一致，真实创建子目录成功。
+它不改变所有者或 SACL，不扩充原有权限。运行后仍须完成下面的写入
+探针、Settings 恢复和真实重传；不能仅凭 ACL 命令成功签字。
+
 确认输出仅恢复测试目录、写入探针恢复成功，再在真实 App Settings 选回原来的桌面
 `LanBridge Received`，Save。检查有无迟到的暂存并按应用正常清理路径处理。
 保留 `.acl` 到恢复确认；不自动删除用户文件。只有恢复后真实重传、落盘哈希和双方
 complete 均确认，才能签字完成 7A-1；7A 空间/强制结束、7B–7E 仍是后续工作。
+
+## Windows 本机接手结果 — 2026-10-29
+
+### 根因和修复
+
+- 从干净的已跟踪源码 `e714f2f` 安全同步 main，在 `fix/windows-staging-denied` 工作。
+  原有未跟踪 `LanBridge.exe`、`_internal/` 未移动、覆盖或提交；无适用 AGENTS.md。
+- 本机 Windows 11 x64（10.0.26200）、C: NTFS，原生 AMD64 Python **3.12.10**；
+  诊断进程是交互用户，SID 与现场拒绝 ACL 一致，使用标准非管理员令牌。
+- 首次采证看到旧包 PID 2768、端口 47384、Responding=True、累计 CPU 约 17,923 秒，
+  当前 Settings 仍指向权限测试目录，日志只有交接中的三条旧记录。没有获得该旧进程的
+  线程栈；后面的栈来自全新隔离身份/目录运行的真实接收服务，不能混称。
+- 新建隔离目录只拒绝实际测试 SID 的 `(WD,AD)`，没有继承/递归标记。真实 `mkdir`
+  返回 `PermissionError` / errno 13 / WinError 5，**`os.access(W_OK)` 仍为 True**。
+  原版 `tempfile.mkdtemp` 2 秒内超过 10,000 次真实 mkdir 尝试，专用子进程到时被终止；
+  faulthandler 栈停在本机 `tempfile.py` 的 `mkdtemp`，目录保持空，随后恢复并验证可写。
+- 修复前新增的真实 TLS 接收回归在 12 秒硬上限被终止；4 秒栈明确为
+  `TransferServer._handle → tempfile.mkdtemp`，证明它阻塞了 asyncio 线程，连该线程内的
+  2 秒超时也不能执行。这是原生 NTFS 和实际服务路径证据，不是模拟 PermissionError。
+- 修复提交 **`671a79ed81a6705655bab2073ebf46c6a1b8517b`** 已立即推送。
+  用 128 位不可预测随机后缀和原子 `mkdir(mode=0o700)` 替换接收暂存的 `mkdtemp`；
+  只对 `FileExistsError` 最多尝试 10 次，权限、空间等错误立即交给原有失败回执处理。
+  暂存前缀、owner marker、清理、逐次确认、TLS、双方证书固定/配对逻辑保持原有机制。
+
+### 已验证的范围
+
+- 修复后的原生 ACL / TLS 子进程测试：同一个服务连续两次 Accept 后都在 0.02 秒内
+  向双方报告非空 WinError 5、0 B，没有暂存或内容。恢复权限后不重启、不重新配对，
+  第三个新请求再次确认并 complete；既有同名哨兵不变，新增 `(1)` 与源 SHA-256 一致。
+- 新增碰撞测试保留已有目录/文件、验证重名重试有上限；权限/ENOSPC 不重试。
+  全量 `python scripts/check.py`：文档、lint、format，**88 passed, 1 macOS-only skip**。
+  原有成功、Decline、取消、校验失败、断线、重启清理、信任撤销等测试均在全量内。
+  双独立进程演示 complete / declined 及真实 mDNS 冒烟也通过。
+- 从该 SHA 的独立干净工作树构建，包内 **source_dirty=false**、AMD64、Python 3.12.10、
+  Qt 6.12.0。`scripts/smoke_bundle.py` 在源码目录外运行冻结 EXE，Qt 对话框及真实 TLS
+  传输 complete。最初原工作区构建因原有未跟踪二进制标为 dirty，未用作验收包。
+- 本地干净 ZIP：`dist/LanBridge-windows-x86_64-671a79e.zip`；SHA-256：
+  `ec89e7c34166d82b2f44d45f4491c423b3bab243391d2513a7239c0f16d12fb6`。
+  这是未签名开发包，不是发行签字。
+- 已对准确修复 SHA 手动调度现有 CI（分支 push 本身不触发），
+  [运行 40907015423](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40907015423)。
+  **六项任务全部成功**：Windows/macOS 的 Python 3.12/3.13 测试及两个原生构建。
+  已检查 3.12 日志：Windows 88 passed / 1 skip，Mac 87 passed / 2 skips（Windows
+  COM 和新原生 ACL 测试）；两端冻结包均通过 Qt 对话框和 TLS complete 自检。
+
+### 留给 Mac 的真实双机回归
+
+Windows 现在运行干净修复包
+`C:\Users\ovitc\Desktop\LanBridge\artifacts\windows-build-671a79e\dist\LanBridge\LanBridge.exe`，
+启动后 PID 14644，UI 为 Ready、47384，并显示原 Mac Online / Paired。
+PID 会变化，测试前仍须复核。诊断期间 2768 已不在；重开后旧包曾为 PID 27120、Ready，
+切换修复包时仅通过 Stop-Process 结束这个已核对完整路径的空闲旧测试进程，未终止其他进程。
+原配置/配对未修改，登录启动仍为关闭。**专用目录的拒绝 ACL 故意保留，外置备份保留，
+目录仍为空，供下一次真实测试；尚未恢复正常接收设置。**
+
+1. Mac 安全 fetch 并切到 `origin/fix/windows-staging-denied`；只 pull main 不包含修复。
+   先确认工作区和准确 SHA。记录两端实际包版本，源码同步本身不等于正在运行新包。
+2. 使用生成的 37 B `01 Mac hello.txt`，Mac 发起，Windows 核对请求和测试目录再点 Accept。
+   双方应迅速 Failed / 明确权限错误、0 B；Windows 无最终文件、无暂存，既有文件不变。
+   不退出或重配，再发起一个新请求并 Accept，验证后续 TLS 和收件服务仍可用。
+3. Windows 恢复该目录备份 ACL，真实写入探针成功，核对目录无迟到暂存。再通过真实
+   Settings / Save 选回正常桌面 `LanBridge Received`；保留备份至所有恢复检查完成。
+4. Mac 再发同一源文件，Windows 再次 Accept。双方 complete，落盘 SHA-256 必须等于
+   `4877bb69a9a4b2443be1dab75950cbc958e36760b378c415b2c2f7b7d3430a1b`，且无暂存。
+   核对源文件、既有文件和信任未变；补做受影响的双向正常传输/Decline/取消回归。
+5. 记录任务 ID、两端版本、双方状态和清理/哈希证据后，由 Mac 复核再合入 main。
+   **目前不声称 7A-1 已通过，未合并 main，也未开始空间/强制结束、7B–7E 或 UI/UX。**
