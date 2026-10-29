@@ -43,13 +43,24 @@ test can isolate regressions. Shared rollback should use `git revert <sha>` and
 then rerun tests, preserving history. Never force-push or reset published history
 as a normal recovery mechanism. Uncommitted work must be reviewed before checkout.
 
-The remote is the owner's private `LanBridge` repository. After checks pass:
+The remote is the owner's public `LanBridge` repository. During M7/M8, after
+relevant checks pass, commit each independent fix/verification checkpoint and
+push it immediately:
 
 ```
 git add <reviewed-files>
 git commit -m '<meaningful change>'
 git push origin main
 ```
+
+The [roadmap](ROADMAP.md) / [中文阶段规划](ROADMAP.zh-CN.md) defines later work:
+finish functional/install gates, create annotated `baseline/pre-uiux-v0.1.0`
+at the accepted commit, then create `uiux/desktop-redesign` from it. These names
+are planned, not existing checkpoints. During M9 push each verified module to
+the UI branch; merge after cross-platform review/regression. Retain the tag and
+successful binaries/hashes. Functional hotfixes go to main first, then into the
+UI branch with affected checks rerun. Keep failed experiments in their branch;
+use revert for published rollback rather than rewriting history.
 
 ## CI and build provenance
 
@@ -59,8 +70,13 @@ execute the frozen diagnostic and upload ZIP/DMG artifacts. Actions are pinned
 to verified upstream commit SHAs; workflow permissions are read-only. There is
 no publishing workflow and no signing secret requirement.
 
+Currently push builds are limited to main, and pull requests run tests without
+native builds. Before M9 UI code starts, extend coverage to validate the UI
+branch's native distributions as well as tests on both systems.
+
 Inspect the Actions run for the exact source commit before claiming CI success.
-Artifacts expire after 14 days. Documentation-only pushes intentionally skip
-builds; the verification record identifies the last code/build commit tested.
+Artifacts expire after 14 days. Changes limited to `docs/**`, `README.md` and
+`CHANGELOG.md` skip CI; `README.zh-CN.md` is currently outside that ignore list.
+The verification record identifies the exact code/build commit tested.
 macOS runner tests do not certify real Finder interaction or physical Mac ↔
 Windows transfers. Follow MANUAL_ACCEPTANCE.md before a production release.

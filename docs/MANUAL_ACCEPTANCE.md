@@ -2,6 +2,12 @@
 
 M7 is in progress on a real M3 and Windows computer. See the [observed evidence](M7_ACCEPTANCE.md) for completed checks; the entire checklist below is not yet signed off.
 
+Execution order is defined in the [roadmap](ROADMAP.md) / [中文阶段规划](ROADMAP.zh-CN.md):
+M7 finishes functional/fault checks, M8 verifies clean installation and actual
+login before freezing the baseline, M9 redesigns UI/UX on a separate branch and
+repeats acceptance, and M10 validates signed distribution. The checklist below
+remains the behavior contract across those stages.
+
 Record build SHA, OS versions, CPU architecture, LAN topology, tester and date.
 Use a Windows 11 x86-64 machine and a real Apple Silicon Mac. No browser is used.
 

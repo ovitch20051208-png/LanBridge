@@ -147,10 +147,11 @@ M3 上真实 Finder 入口、正常用户配置的单实例转交及向 Windows 
 
 ## 当前开发与验证状态
 
-[已记录的 CI](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40571919800)
+[已记录的 CI](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40769388025)
 通过了 Windows / Apple Silicon 测试、原生构建和打包程序自检。
-[M7 实机测试](docs/M7_ACCEPTANCE.md)已验证 M3 原生应用、Finder 单实例入口、明确拒绝，以及三个文件的 Mac → Windows → Mac 往返，SHA-256 全部一致。完整边界清单、Explorer 入口、干净系统安装、实际登录启动和发行签名 / 公证仍属于
-[实机验收项目](docs/MANUAL_ACCEPTANCE.md)。
+[M7 实机测试](docs/M7_ACCEPTANCE.md)已验证 Finder / Windows 右键直发、单实例重开、双向 4 GiB 哈希、中断重传、任务归档及 Mac 接收存储异常。Windows 接收端剩余异常、信任/原生入口边界、干净安装和真实登录仍按[实机清单](docs/MANUAL_ACCEPTANCE.md)继续验收。
+
+[后续阶段规划](docs/ROADMAP.zh-CN.md)：先完成功能验收与安装验证并冻结基线，再单开分支做 UI/UX；改版后重新跨平台回归，最后完成签名/公证和发行包验收。
 
 V1 不包含文件夹传输、断点续传、自动接受、手机/网页客户端、蓝牙、云中转或 Apple AirDrop 协议兼容。
 **Transfer history 只记录本次运行中的近期任务，不是永久历史记录。**

@@ -1,5 +1,11 @@
 # Verification record
 
+Active sequencing as of 2026-10-29: finish M7 functional acceptance, pass M8
+installation/baseline gates, then begin M9 UI/UX on a separate branch and M10
+release validation. See the [English roadmap](ROADMAP.md) / [中文阶段规划](ROADMAP.zh-CN.md).
+No UI branch or baseline tag is created by this planning checkpoint; historical
+entries below retain their original checkpoint scope.
+
 M1–M6 development host: Windows x86-64, Python 3.12.10; a physical Mac was
 unavailable at those checkpoints. M7 below records the subsequent real M3 work.
 Earlier unavailable/unexecuted statements describe their historical checkpoints.
@@ -597,3 +603,18 @@ No source-code change or new package was needed; both installed apps remain on
 `ec981af`, whose six CI jobs passed. This documentation-only checkpoint is
 excluded from CI by the workflow's path filter. Remaining Windows storage,
 clean-system/login, trust/multi-device and release-signing gates are separate.
+
+## Owner-directed stage sequencing — 2026-10-29
+
+The owner requested UI/UX work only after current-feature testing and known
+functional fixes are complete, with a separate recoverable branch. Roadmaps now
+define M7 remaining physical checks, M8 clean-install/login and baseline sign-off,
+M9 UI/UX and cross-platform regression, and M10 signed release validation.
+Planned baseline tag and UI branch are named but not created. Each completed
+module remains a validated commit pushed immediately to its working branch.
+The main-only native-build CI limitation is recorded as an M9 prerequisite.
+No new application behavior or physical test pass is claimed.
+
+Planning checkpoint validation: 16 Markdown files / 217 local links / 39 images,
+lint/format and **83 passed, 1 Windows COM skip**. Updating the Chinese README
+also triggers the current CI workflow; its outcome must be inspected separately.

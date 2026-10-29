@@ -155,8 +155,10 @@ The [English illustrated guide](docs/USER_GUIDE.md) and
 ## Development status
 
 Windows and Apple Silicon tests, native builds and frozen executable checks passed
-in the [recorded CI run](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40571919800).
-[M7 physical testing](docs/M7_ACCEPTANCE.md) verified the M3 native app, Finder single-instance forwarding, explicit Decline and a three-file Mac → Windows → Mac round trip with matching SHA-256. The full edge-case checklist, Explorer action, clean-machine installation, actual login startup and signing/notarization remain [manual release gates](docs/MANUAL_ACCEPTANCE.md).
+in the [recorded CI run](https://github.com/ovitch20051208-png/LanBridge/actions/runs/40769388025).
+[M7 physical testing](docs/M7_ACCEPTANCE.md) verified Finder/Windows direct send, single-instance reopening, two-way 4 GiB hashes, interruption/retry, task archiving and Mac receive-storage gates. Remaining Windows receiver faults, trust/native edges, clean installation and actual login remain [manual acceptance work](docs/MANUAL_ACCEPTANCE.md).
+
+The [roadmap](docs/ROADMAP.md) sequences functional acceptance and an installation-tested baseline before a separate UI/UX branch. Redesigned builds repeat cross-platform acceptance; signing/notarization and final distribution follow afterward.
 
 V1 does not include folders, interrupted-transfer resume, auto-accept, mobile/web
 clients, Bluetooth, cloud relay or Apple's AirDrop protocol. **Transfer history
