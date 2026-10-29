@@ -407,7 +407,7 @@ If the receiver restarts, check the current endpoint values again.
 | Receiver unexpectedly quits | Reopen its installed app; incomplete temporary data is cleaned on startup and complete files remain. Retry from the start and accept the new request. If Finder shows a Run Shell Script error after force-quitting an action-launched app, dismiss it with OK before reopening. |
 | Disconnect / cancel | Reconnect to the LAN, keep both apps running and check Paired, then send again and Accept the new request. Transfers restart from the beginning. Inspect the destination first if the final receipt might have been lost. |
 | Unsafe filename / folder rejected | Select files, not folders; rename to a portable filename or make a ZIP yourself. |
-| Cannot write destination / insufficient space | Choose a writable folder in Settings and free enough disk space. |
+| Permission denied / Insufficient free space | On the receiving computer, use **Settings… → Save received files to → Browse… → Save** to select a writable folder with enough free space, or free space in the current destination. Then the sender sends again and the receiver accepts the new request. **Archive task** closes the failed result; it does not retry. |
 | Old device name | Quit/restart after saving a name; pairing records may keep their earlier saved name. |
 | Native action missing after moving app | Reinstall it from Settings; on Mac check Services visibility. |
 | Manual connection fails | Do not mix pairing and transfer ports; use the recipient's current IP and full trusted fingerprint. |

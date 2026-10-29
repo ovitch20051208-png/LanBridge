@@ -1,6 +1,6 @@
 # M7 physical Mac and two-computer evidence
 
-Dates: 2026-10-27–28. Mac operated through native UI automation; Windows operated by
+Dates: 2026-10-27–29. Mac operated through native UI automation; Windows operated by
 the project owner and reported in chat. Windows screenshots/control are not
 available to the Mac operator. This record distinguishes observed Mac results
 from the tester's Windows reports; the complete manual release gate is not yet
@@ -217,7 +217,7 @@ The large source's streaming SHA-256 was verified before the test:
 
 ![Same-file retry completes after Windows Wi-Fi returns](images/mac-m7/30-network-retry-complete.jpg)
 
-## Receive storage gates — 2026-10-28
+## Receive storage gates — 2026-10-28–29
 
 This phase uses the existing clean `ec981af` apps and normal Mac user profile.
 Windows is the sender; Windows UI results are tester reports. Only newly created
@@ -247,6 +247,46 @@ security checks: **33 passed**. No source-code change was required for this case
 This is Mac receiving; Windows receiving/storage-denial remains a separate test.
 
 ![Real receive failure when the configured directory becomes unwritable](images/mac-m7/36-receive-permission-denied.jpg)
+
+### Mac insufficient-space preflight
+
+Operator created and mounted a new 64 MiB HFS+ sparse disk image, with a writable
+receive directory on that separate filesystem. Measured filesystem capacity was
+67,067,904 B, with 65,490,944 B free. This was an actual small-volume test, not a
+mocked free-space result; the host's physical disk was not filled or reformatted.
+The directory already contained a generated `existing.txt` sentinel.
+
+Actual Settings/Save selected this directory. Tester sent `network drop 4 GiB.bin`
+(4,294,967,296 B) from Windows; operator observed the correct Save to destination
+in the Mac consent dialog and clicked Accept. Request `bdd18382…` became Failed /
+Insufficient free space at 0 B; tester confirmed the same Windows failure.
+No payload, new final file or staging directory was retained. Free space was
+unchanged; the sentinel retained its mtime and SHA-256
+`9a6a437ce90407f54d376d7854ca3d0ccdfc6c8d3c4995cdf54a8f246527f1ce`.
+The nine original Desktop receive files retained their sizes and mtimes.
+Actual Archive task returned Ready. This validates the preflight space gate,
+not disk exhaustion midway through a transfer or the Windows receiver's gate.
+
+![Real small-volume receive request fails before payload transfer](images/mac-m7/37-receive-insufficient-space.jpg)
+
+### Restore normal settings and receive again — 2026-10-29
+
+Operator restored Desktop/LanBridge Received through actual Settings/Save;
+decoded settings matched the original snapshot, including login startup disabled.
+The test directory's original 0755 permissions were restored. Only the owned
+small test volume was detached; its sparse image remains in ignored test artifacts.
+The recovery app process was PID 61426, different from PID 52809 on October 28:
+this is recovery after restart, not a same-process continuity claim across days.
+
+Tester resent the original 37 B hello from Windows. Operator observed the normal
+Desktop destination in the real consent dialog and clicked Accept. Request
+`0665cfae…` completed at 37/37 B, saved as `01 Mac hello (5).txt`, with SHA-256
+`4877bb69a9a4b2443be1dab75950cbc958e36760b378c415b2c2f7b7d3430a1b`,
+matching the source. All nine earlier files retained their sizes/mtimes and no
+staging remained. Tester confirmed Windows complete. Actual Mac Archive task
+returned Ready and hid the bar. No source-code change was required for this phase.
+
+![Successful physical receipt after restoring the normal destination](images/mac-m7/38-storage-settings-recovery.jpg)
 
 ## Generated small-file reference hashes
 
@@ -280,6 +320,10 @@ identities/configuration and do not replace the physical checks above.
 
 The `ec981af` CI run 40769388025 passed all six test/build jobs and both frozen diagnostics. Inspected Python 3.12 logs on each platform show **83 passed, 1 platform-specific skip**.
 
+The October 29 storage-recovery full Mac gate also passed documentation,
+lint/format and **83 tests, 1 Windows COM skip**. This phase changes documentation
+and evidence only; the CI workflow excludes docs-only pushes.
+
 ## Remaining checks and one observed runtime log issue
 
 - Fresh non-administrator/clean-system installation, downloaded-app quarantine
@@ -289,7 +333,8 @@ The `ec981af` CI run 40769388025 passed all six test/build jobs and both frozen 
   This Mac has no valid signing identity; notarytool is available.
 - Three-physical-computer recipient selection, first-pairing Decline/revocation,
   Windows receiver force-kill/restart cleanup, Windows receive-storage faults,
-  Mac low-disk gate and the full manual edge-case checklist are not yet signed off.
+  mid-transfer disk exhaustion and the full manual edge-case checklist are not
+  yet signed off. Mac preflight low-space rejection is verified above.
 - At 21:37 UTC during forced Windows receiver Quit, one non-fatal asyncio
   `_call_connection_lost` traceback was logged after the correct Connection lost
   UI error. Subsequent real transfers succeeded and cleanup was reported by the

@@ -1,4 +1,4 @@
-# Physical Mac M7 captures — 2026-10-27–28
+# Physical Mac M7 captures — 2026-10-27–29
 
 These JPEGs are unedited captures of the real application/Finder on an Apple M3,
 macOS 15.7 (24G222), captured with native computer-control screenshots. The app
@@ -113,3 +113,15 @@ Images 32–34 use clean `ec981af` for the corrected physical reverse Wi-Fi test
   Failure at 0 B, Failed label and Archive task were observed; original files
   and sentinel hash were unchanged, with no staging. Permissions and normal
   App receive settings were restored after this capture.
+
+- `37-receive-insufficient-space.jpg`: clean `ec981af`, real Windows 4 GiB offer
+  accepted into a writable directory on an actual 64 MiB test volume. Mac
+  rejected at 0 B with Insufficient free space; free space, sentinel and normal
+  receive files were unchanged, with no new final file or staging. Tester
+  separately confirmed the Windows failure.
+- `38-storage-settings-recovery.jpg`: same clean build on October 29 after a
+  restart, restoration of the original normal-profile receive settings and
+  detachment of the test volume. A new Windows hello offer completed at 37 B;
+  independent Mac SHA-256 matched the source, existing files were preserved and
+  no staging remained. Tester confirmed Windows complete. Operator archived
+  this task and returned the App to Ready afterward.

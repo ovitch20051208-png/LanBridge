@@ -570,3 +570,30 @@ UI; decoded settings exactly matched the pre-test snapshot. PID 52809 continued
 running. Native screenshot 36 records the failure. Existing security suite:
 **33 passed**. This phase needed no code change; Windows receiving permission
 faults and actual Mac low-space validation are separate.
+
+## M7 continuation — small-volume space gate and recovery — 2026-10-28–29
+
+Selected an actual writable directory on a newly created 64 MiB HFS+ virtual
+volume through normal App Settings. Filesystem capacity was 67,067,904 B and free
+space 65,490,944 B. Physical Windows 4 GiB offer `bdd18382…` was explicitly
+accepted on Mac, then failed at 0 B with Insufficient free space; the Windows
+tester confirmed the same failure. No payload, new file or staging remained;
+free space and the pre-existing sentinel hash/mtime were unchanged. All nine
+normal Desktop receive files retained their sizes/mtimes. Screenshot 37 records
+the preflight rejection. This does not exercise mid-stream disk exhaustion or
+Windows as the storage-fault receiver.
+
+Restored the exact original settings through the App UI and detached only the
+owned test volume. The test directory permissions are restored to 0755; the disk
+image remains ignored. On October 29, recovery used PID 61426 after the earlier
+PID 52809, so no same-process overnight continuity is claimed. Physical Windows
+hello retry `0665cfae…` completed into Desktop/LanBridge Received as `(5)`, 37 B,
+with SHA-256 matching the source. Earlier files were unchanged and no staging
+remained. Tester confirmed Windows complete. Actual Mac Archive task returned
+Ready; screenshot 38 records completion before archiving.
+
+Full Mac gate: documentation, lint/format, **83 passed, 1 Windows COM skip**.
+No source-code change or new package was needed; both installed apps remain on
+`ec981af`, whose six CI jobs passed. This documentation-only checkpoint is
+excluded from CI by the workflow's path filter. Remaining Windows storage,
+clean-system/login, trust/multi-device and release-signing gates are separate.
