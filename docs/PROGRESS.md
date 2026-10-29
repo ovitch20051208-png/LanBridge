@@ -732,3 +732,19 @@ the earlier failure. Mac archived both to Ready; source SHA-256 stayed unchanged
 Images 41–42 record the Mac results; [M7 evidence](M7_ACCEPTANCE.md) records hashes.
 ACL/settings restoration, successful recovery and affected regression remain
 pending; no full 7A-1 sign-off or main merge is claimed.
+
+## M7 / 7A-1 — physical permission recovery passes — 2026-10-29
+
+Windows tester/local diagnostics restored the test directory from its retained
+ACL backup: three ACEs and inheritance protection matched, write/read/remove
+probe passed, no staging. Actual Settings/Browse/Save restored the normal Desktop
+receive folder. Windows PID remained 14644; no app restart or source/Git changes.
+
+Actual Mac Finder Send with LanBridge offered the original 37 B hello directly
+through normal-profile PID 66956 (`4f94568e…`), without main-window Send files or
+an unrelated second instance. Both sides complete. Tester PowerShell verified
+`01 Mac hello (4).txt` SHA-256 exactly matched the original and confirmed no
+staging in either Windows folder. Mac original ten files/settings/identity/trust
+hashes stayed unchanged; completion archived to Ready. Screenshot 43 captures
+Mac completion. 7A-1's full permission/recovery gate passes; reverse/Decline/cancel
+regression and main integration are next, before the remaining M7 rounds.

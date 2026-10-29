@@ -1,6 +1,6 @@
 # M7 / 7A Windows 接收权限卡住：本机诊断交接
 
-更新于 2026-10-29。**原生修复和真实双机两次权限拒绝/清理已验证，恢复后重传仍待验收**，
+更新于 2026-10-29。**7A-1 真实双机权限拒绝、持续服务、恢复后重传及落盘哈希已通过**，
 不进入 UI/UX 改版。原始现场保留，最新结果见“Windows 本机接手结果”和“Mac 接手实机复测”。
 项目：`https://github.com/ovitch20051208-png/LanBridge`。
 先读 [阶段规划](ROADMAP.zh-CN.md)、[实机证据](M7_ACCEPTANCE.md)、
@@ -217,3 +217,13 @@ Windows 所有者确认运行 `671a79e` 修复包，拒绝 ACL 仍生效。
 两次错误回执与清理部分通过，完整 7A-1 仍待权限/设置恢复后的成功重传和回归。
 当前请求 Windows 侧仅做 DACL 恢复/写入探针，不改源码、不做 Git 操作、不重启应用；
 然后由所有者通过真实 Settings / Save 恢复正常接收目录。
+
+## 权限恢复与 Finder 重传通过 — 2026-10-29
+
+Windows 侧报告已按备份恢复唯一测试目录：三条 ACE、继承保护 False 均匹配；探针
+创建/写入/读回/移除成功，备份哈希不变且保留，两处目录无暂存。真实 Settings / Save
+选回 `C:\Users\ovitc\Desktop\LanBridge Received`。PID 仍为 14644，没有重启。
+Mac PID 66956 通过实际 Finder 右键直发 `4f94568e…`，Windows Accept 后双方 complete。
+Windows PowerShell 独立核对新文件 `01 Mac hello (4).txt`，37 B 原件哈希完全一致，
+无暂存；Mac 原文件、身份/信任/设置不变，已归档回到 Ready。
+7A-1 权限与恢复闭环通过；合并前继续受影响的反向、Decline、取消回归，不开始其他阶段。

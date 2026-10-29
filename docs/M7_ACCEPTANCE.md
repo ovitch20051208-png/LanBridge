@@ -400,6 +400,32 @@ the full 7A-1 gate and merge to main are not yet signed off.
 
 ![Second accepted request still gets a prompt permission failure](images/mac-m7/42-windows-acl-second-request.jpg)
 
+## Windows ACL restoration and Finder recovery — 2026-10-29
+
+Tester/Windows-local diagnostics confirmed the unique test directory's three ACEs
+and inheritance-protection flag (False) matched its saved backup. A private probe
+was created, written, read back and removed; both receive directories were empty
+of staging. Outside ACL backup was retained with unchanged SHA-256. Actual App
+Settings/Browse/Save restored Desktop/LanBridge Received. Windows PID remained
+14644; no app restart, code/Git operation or configuration-file edit was performed.
+
+Operator selected the original 37 B hello in real Finder and invoked Send with
+LanBridge. Request `4f94568e…` reached the existing normal-profile Mac PID 66956
+and started directly without the main Send files button; no second app remained.
+After Windows Accept, Mac displayed complete at 37/37 B and tester confirmed
+Windows complete. Tester independently ran PowerShell Get-FileHash on the latest
+received file, `Desktop/LanBridge Received/01 Mac hello (4).txt`; SHA-256 was
+`4877bb69a9a4b2443be1dab75950cbc958e36760b378c415b2c2f7b7d3430a1b`,
+matching the original. Tester confirmed no staging in either Windows directory.
+Mac original ten files, settings and identity/trust hashes remained unchanged;
+its completion was archived to Ready, same PID.
+
+The 7A-1 prompt-denial/continued-service/permission-restoration/successful-retry
+gate passes. Affected physical reverse/Decline/cancellation regression and main
+integration remain separate; the rest of M7 is not signed off by this result.
+
+![Finder retry completes after Windows ACL and settings recovery](images/mac-m7/43-windows-acl-recovery-complete.jpg)
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |

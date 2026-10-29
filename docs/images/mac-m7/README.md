@@ -142,3 +142,9 @@ tester-confirmed clean `671a79e`:
 - `42-windows-acl-second-request.jpg`: another accepted offer promptly fails on
   the still-denied Windows directory, showing continued service. Tester confirmed
   hidden listing empty. Mac archived both to Ready; recovery remained pending.
+
+- `43-windows-acl-recovery-complete.jpg`: same clean Mac `30fb3bf`, real Finder
+  direct request completes at 37/37 B after Windows ACL/settings restoration,
+  without restarting either app. Tester confirmed Windows complete, saved `(4)`,
+  independently matching PowerShell SHA-256 and no staging. Mac later archived
+  to Ready; source and earlier receive files stayed unchanged.
