@@ -74,6 +74,38 @@ remain reviewable. Archiving is separate from cancelling an active transfer.
 Windows: `Get-FileHash -Algorithm SHA256 -LiteralPath '<path>'`.
 Mac: `shasum -a 256 -- '<path>'`.
 
+## Three-physical-computer gate — M7 round 7E
+
+This is required before the pre-UI/UX baseline, not deferred to visual redesign.
+The planned topology is the existing Mac A, Windows B and an additional Windows C
+reported available by the owner. C's Windows 11 x86-64 environment and exact build
+are not yet verified. Detailed expectations are in the [roadmap](ROADMAP.md#m7-round-7e--three-computer-gate-before-uiux)
+and [中文三机清单](ROADMAP.zh-CN.md).
+
+- Use distinct identities on three real hosts. Record OS/build/architecture,
+  fingerprint, app source SHA, receive folders and LAN. Discover two peers per
+  machine; establish each necessary pair with the full six-group comparison.
+- Verify A→B, B→A, A→C, C→A, B→C and C→B separately: explicit consent, both ends
+  complete, exact hashes and no staging. Windows-to-Windows is included.
+- With two paired online targets, invoke Finder/Send To and choose each target
+  once in separate requests. Only that host is prompted. Cancel sends nothing;
+  one eligible target still direct-sends. Recheck same display names with distinct
+  identities, and exclude unpaired/offline/revoked candidates.
+- Observe actual overlapping payload for A→B plus A→C, B→A plus C→A, and A↔B
+  plus C→A. Validate individual prompts, correct task/progress/history ownership
+  and output hashes. Mix large/small files and inspect UI responsiveness.
+- Decline/cancel one task while the other continues. Disconnect/Quit B while
+  A↔C continues; revoke B while C stays paired. Check peer-specific cancellation,
+  failure and staging cleanup, then restore/re-pair/retry B.
+- B/C concurrently send different same-basename contents to A with an existing
+  sentinel. Preserve all contents without overwrite; validate by hash.
+- Reopen/close main windows and repeat native entries with one normal-profile
+  instance per host. Record request IDs and per-host observations; Windows clicks
+  require tester confirmation. Three processes on one host are not this gate.
+
+These are separate sends with per-request consent; no broadcast feature is
+introduced. Repeat affected three-computer checks after UI/UX changes.
+
 ## Automated reproduction
 
 ```

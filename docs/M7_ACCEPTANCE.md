@@ -335,6 +335,11 @@ and evidence only; the CI workflow excludes docs-only pushes.
   Windows receiver force-kill/restart cleanup, Windows receive-storage faults,
   mid-transfer disk exhaustion and the full manual edge-case checklist are not
   yet signed off. Mac preflight low-space rejection is verified above.
+- The owner reports a third Windows computer is available. The explicit
+  [three-computer gate](MANUAL_ACCEPTANCE.md#three-physical-computer-gate--m7-round-7e)
+  covers six directions, target routing, concurrent transfers and peer isolation
+  before baseline freeze. Its environment and physical outcomes remain unverified;
+  no three-computer pass is claimed here.
 - At 21:37 UTC during forced Windows receiver Quit, one non-fatal asyncio
   `_call_connection_lost` traceback was logged after the correct Connection lost
   UI error. Subsequent real transfers succeeded and cleanup was reported by the

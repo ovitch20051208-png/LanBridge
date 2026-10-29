@@ -44,11 +44,13 @@ preparing a tested development-preview baseline.
 | 7B — consent/trust | Recheck first-pairing Decline with fresh isolated identities, unanswered-request expiry, cancel while waiting/during payload from both sides, Forget during pending/active requests, re-pair and restart. | No unintended trust, payload or success; stale dialogs close; revoked trust prevents new sends; pairing/consent restore operation. |
 | 7C — native/connection edges | Rapid Finder/Send To invocations, cold/warm single-instance state, duplicate basenames, changed device names, manual connection when multicast is unavailable. | Correct paths/recipient, no unrelated extra instance, preserved originals and validated output; discovery/settings restored afterward. |
 | 7D — reliability | Safe mid-stream space exhaustion on owned virtual volumes, agreed longer/repeated transfers and the older nonfatal asyncio teardown traceback. | Complete/hash or explicit failure/cleanup evidence; isolate and resolve known faults before baseline sign-off. Do not suppress an unexplained traceback to declare success. |
+| 7E — three physical computers | Mac A and Windows B/C: all six directed paths, multi-target routing, simultaneous tasks, peer-specific faults and trust isolation. | Pass the explicit three-computer gate below before M8 baseline sign-off; record evidence per path/task, not just discovery. |
 
 Use [MANUAL_ACCEPTANCE.md](MANUAL_ACCEPTANCE.md) for procedures and
 [M7_ACCEPTANCE.md](M7_ACCEPTANCE.md) to avoid repeating completed cases unless a
-related fix changes them. A three-physical-device recipient check needs another
-device. Missing hardware/environment cases stay pending; a deferral needs explicit
+related fix changes them. The owner reports another Windows computer is available
+for round 7E; its environment/build still needs verification. Missing environment
+cases stay pending; a deferral needs explicit
 owner acceptance and a record, never a false pass. Windows results require the
 owner's observation; Mac automation cannot certify them.
 
@@ -56,6 +58,51 @@ Windows setup is guided one action at a time: restrict only a newly created
 fixture directory and use an owned small VHD for space tests. Record the original
 receive path and provide restoration steps. Do not fill a physical disk, change
 an ordinary download folder's permissions or disable OS protections.
+
+## M7 round 7E — three-computer gate before UI/UX
+
+Topology: A is the current Apple Silicon Mac, B the current Windows peer, C the
+additional Windows computer reported by the owner. Verify C's Windows 11 x86-64
+environment, exact clean app build and reachable LAN before execution. This is
+a planned test, not a completed three-computer result. Use three physical machines
+with distinct identities, not three processes on one host. This topology covers
+one Mac/two Windows; two Macs/one Windows remains a separate coverage extension.
+
+1. **Discovery/pairing:** each machine lists the other two without duplicate/self
+   entries. Establish each needed pair by comparing all six code groups; trust
+   persists across restart. Check an online unpaired C before pairing: it must
+   not become a direct-send candidate or inherit B's trust.
+2. **Six directed paths:** A→B, B→A, A→C, C→A, B→C and C→B. Each is a separate
+   transfer with receiver consent, complete on both sides, matching source/output
+   SHA-256 and no staging residue. Use generated identifying content, including
+   small, empty, Unicode and space-named files; check each receiver's own path.
+3. **Target selection:** with two paired online targets, the native action shows
+   the picker; choose B once, then C in a separate invocation. Only the chosen
+   machine gets the request. Cancel closes selection without a send. Repeat from
+   Mac and Windows; with only one eligible online target, direct request remains.
+   Test equal display names with distinct identities for unambiguous routing.
+4. **Overlapping tasks:** A→B and A→C; B→A and C→A; then A↔B while C→A. Confirm
+   actual overlapping payload, individual consent, correct task/progress/history
+   association and independent completion/hashes. Mix a large and small file to
+   check responsiveness. Multi-target testing uses independent sends, not a new
+   broadcast feature or permission to auto-accept.
+5. **Fault isolation:** Decline/cancel one request while another runs; disconnect
+   or quit B while A↔C runs; Forget B while C remains paired. Only B's affected
+   requests stop; C continues. No misrouted prompt, cancellation, completion or
+   cleanup; restore B and verify re-pair/retry as required.
+6. **Concurrent collisions:** B/C send different generated contents with the same
+   basename to A. Preserve the existing sentinel and both received contents with
+   collision-safe filenames; validate hashes by content, not completion order.
+7. **Lifecycle/repeat:** hide/reopen main windows and invoke both native actions
+   during multi-peer operation. Keep one normal-profile app per host and stable
+   identities; repeat the routing/fault cases and check all owned staging cleanup.
+
+Record each host's OS/architecture/build/fingerprint, pairing topology, direction,
+request IDs, expected recipient, source/output hashes, consent and fault results.
+Mac checks and the owner's Windows reports remain distinct evidence. Local
+multi-process automation supplements this gate; it cannot certify three-host LAN
+behavior. Known failures are fixed/retested on both platforms before freezing.
+Repeat multi-target routing and overlapping-task/fault isolation after M9 UI changes.
 
 ## M8 baseline sign-off
 

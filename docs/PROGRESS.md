@@ -618,3 +618,18 @@ No new application behavior or physical test pass is claimed.
 Planning checkpoint validation: 16 Markdown files / 217 local links / 39 images,
 lint/format and **83 passed, 1 Windows COM skip**. Updating the Chinese README
 also triggers the current CI workflow; its outcome must be inspected separately.
+
+## Three-computer scope clarified — 2026-10-29
+
+Owner confirmed a third Windows computer is available. Added explicit M7 round
+7E before baseline freeze: one Mac plus two Windows, all six directed paths,
+multi-target native routing, overlapping send/receive, independent cancellation/
+disconnect/revocation, same-basename publication and lifecycle/repeat checks.
+The additional machine's environment/build and all three-host results remain
+unverified. No hardware setup, application change or new physical pass is claimed.
+M9 regression must include affected multi-peer behavior as well as two-host flows.
+
+Documentation/lint/format and **83 tests passed, 1 Windows COM skip** for this
+scope update. Prior planning commit `f5eabff` CI run 40857391825 completed all six
+test/native-build jobs successfully. This new docs-only change is excluded from
+CI by the existing path filter; no three-host physical result is inferred.
