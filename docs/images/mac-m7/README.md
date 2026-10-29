@@ -133,3 +133,12 @@ Images 32–34 use clean `ec981af` for the corrected physical reverse Wi-Fi test
   successful TLS and tester-confirmed Accept. Mac ultimately timed out at 0/37 B;
   tester reported no Windows progress/failure update and an empty hidden directory
   listing. The fault is open; Mac later archived this failure and returned Ready.
+
+Images 41–42 use clean Mac build `30fb3bf` (transfer fix `671a79e`) and Windows
+tester-confirmed clean `671a79e`:
+
+- `41-windows-acl-fails-promptly.jpg`: real accepted 37 B offer returns WinError 5
+  to Mac, 0 B, Failed. Tester separately confirmed immediate Windows receive error.
+- `42-windows-acl-second-request.jpg`: another accepted offer promptly fails on
+  the still-denied Windows directory, showing continued service. Tester confirmed
+  hidden listing empty. Mac archived both to Ready; recovery remained pending.

@@ -369,6 +369,37 @@ hash. The [updated native handoff](WINDOWS_DEBUG_HANDOFF.zh-CN.md) includes the
 tested non-admin DACL restoration alternative if icacls /restore returns 1300.
 Automated native acceptance is not physical Mac ↔ Windows sign-off.
 
+## Mac fix bundle and physical ACL rejection — 2026-10-29
+
+Mac safely checked out the fix branch at `30fb3bf` (transfer fix `671a79e` plus
+Windows evidence docs). Full native Mac gate: **87 passed, 2 Windows-only skips**.
+CI 40907015423's six successful jobs were independently checked. Clean arm64
+Python 3.12.16/Qt 6.12.0 app/ZIP/DMG were built; strict deep ad-hoc signature
+verification and frozen Qt/TLS/hash diagnostics passed. Installed at Applications
+after normal Quit, retaining the old bundle in ignored artifacts. Normal settings
+and identity/trust hashes were unchanged. Single new Mac app PID: 66956.
+
+Mac package SHA-256 at clean `30fb3bf`:
+
+- ZIP: `910c9079855b7a295137978dfb1c81ff5a6f9946bedee9b64a1682a8b6051baf`
+- DMG: `7e7e0e48472b3af4dbfff6c33972e7afd6d6fa7e823da2f0f8fd724b4e921224`
+
+Tester confirmed Windows clean `671a79e` with its test directory still denied.
+Real offers `7db6bd1d…` and `674b5d6c…`, each 37 B, were Accepted. Tester reported
+immediate Receive error / access denied both times. Mac received explicit WinError 5
+at 0/37 B each time, without handshake stall or empty reason. The second request
+exercised continued service after the first failure. Tester confirmed the hidden
+directory listing had no entries. Mac archived both results to Ready; its ten
+original received files and source SHA-256 stayed unchanged, with no Mac staging.
+
+Prompt denial, repeated service and empty-directory checks pass within that scope.
+ACL/settings restoration and a real complete/hash-matching retry remain pending;
+the full 7A-1 gate and merge to main are not yet signed off.
+
+![Real permission failure reaches the Mac sender promptly](images/mac-m7/41-windows-acl-fails-promptly.jpg)
+
+![Second accepted request still gets a prompt permission failure](images/mac-m7/42-windows-acl-second-request.jpg)
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |

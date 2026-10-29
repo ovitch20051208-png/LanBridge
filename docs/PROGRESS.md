@@ -713,3 +713,22 @@ manual testing. A DACL-only backup restore was separately verified on a new
 directory with the same non-admin token, because icacls /restore returns 1300
 in this token. Physical failure/retry/hash and Mac cross-platform review remain
 pending; no 7A-1 pass, main merge, baseline freeze or UI/UX start is claimed.
+
+## M7 / 7A — Mac fix package and two physical denials — 2026-10-29
+
+Safely fetched/checked out the fix branch at `30fb3bf`; no transfer implementation
+was rewritten. Native Mac full gate: **87 passed, 2 Windows-only skips**. Confirmed
+all six jobs of CI 40907015423 successful. Built clean arm64 Python 3.12.16 /
+Qt 6.12.0 app/ZIP/DMG; strict deep signature and frozen Qt/TLS/hash checks passed.
+Installed in Applications after ordinary Quit, preserving the previous bundle in
+ignored artifacts. Original settings, identity/trust hashes and ten receive files
+stayed unchanged; one new Mac app process is PID 66956.
+
+Tester confirmed Windows clean `671a79e` and the denied destination. Physical
+offers `7db6bd1d…` and `674b5d6c…`, each 37 B, were Accepted and promptly returned
+explicit WinError 5 at 0 B on Mac. Tester reported immediate access denial both
+times and an empty hidden listing. The later request remained serviceable after
+the earlier failure. Mac archived both to Ready; source SHA-256 stayed unchanged.
+Images 41–42 record the Mac results; [M7 evidence](M7_ACCEPTANCE.md) records hashes.
+ACL/settings restoration, successful recovery and affected regression remain
+pending; no full 7A-1 sign-off or main merge is claimed.
