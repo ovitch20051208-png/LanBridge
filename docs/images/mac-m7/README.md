@@ -125,3 +125,11 @@ Images 32–34 use clean `ec981af` for the corrected physical reverse Wi-Fi test
   independent Mac SHA-256 matched the source, existing files were preserved and
   no staging remained. Tester confirmed Windows complete. Operator archived
   this task and returned the App to Ready afterward.
+
+- `39-windows-receiver-tls-stall.jpg`: clean `ec981af`, Mac sender's 0/37 B
+  handshake timeout while the Windows ACL test was pending. TCP/listener and
+  Windows responsiveness were checked separately; this is not a Windows capture.
+- `40-windows-acl-accept-timeout.jpg`: same build, after Windows Quit/reopen,
+  successful TLS and tester-confirmed Accept. Mac ultimately timed out at 0/37 B;
+  tester reported no Windows progress/failure update and an empty hidden directory
+  listing. The fault is open; Mac later archived this failure and returned Ready.

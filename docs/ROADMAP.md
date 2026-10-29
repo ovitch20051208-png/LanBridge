@@ -54,6 +54,10 @@ cases stay pending; a deferral needs explicit
 owner acceptance and a record, never a false pass. Windows results require the
 owner's observation; Mac automation cannot certify them.
 
+Round 7A-1 has found a Windows receive hang after ACL write denial and remains
+failed/open. Follow the [Windows-native handoff](WINDOWS_DEBUG_HANDOFF.zh-CN.md)
+to diagnose/fix/retest before proceeding; restored TLS after restart is not a fix.
+
 Windows setup is guided one action at a time: restrict only a newly created
 fixture directory and use an owned small VHD for space tests. Record the original
 receive path and provide restoration steps. Do not fill a physical disk, change

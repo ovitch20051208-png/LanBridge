@@ -288,6 +288,36 @@ returned Ready and hid the bar. No source-code change was required for this phas
 
 ![Successful physical receipt after restoring the normal destination](images/mac-m7/38-storage-settings-recovery.jpg)
 
+## Windows receive permission gate — 2026-10-29 — failed, investigation open
+
+The tester verified the installed Windows app is clean `ec981af`, AMD64,
+Python 3.12.10/Qt 6.12.0. Its generated empty test receive folder was selected
+through App Settings. An outside `icacls /save` backup was created; denying the
+interactive user's add-file/add-directory rights produced a real UnauthorizedAccess
+write probe. Only the owned test directory was restricted.
+
+Requests `f78fcf23…` and `81b3150d…` stalled during TLS; actual TCP was established
+to the tester-confirmed Windows LAN address/port, whose listener was LanBridge.
+The Windows GUI still responded, while its log had no new offer entries.
+After tester Quit/reopen, discovery and TLS returned. New request `4a7fd4cc…`
+reached consent; the tester clicked Accept, but Windows displayed no failure or
+progress change. Mac eventually timed out at 0/37 B. The tester's forced hidden
+directory listing was empty. Restart is not a correction: the ACL case still fails.
+
+Source inspection identified synchronous `tempfile.mkdtemp` as a candidate:
+CPython 3.12 can retry PermissionError on Windows when os.access reports writable.
+A bounded isolated model observed four repeated denied mkdir calls. This is not
+native NTFS or actual receiver-stack proof. No source fix or physical pass is
+claimed. Owner requested Windows-local Codex assistance; the
+[native diagnostic handoff](WINDOWS_DEBUG_HANDOFF.zh-CN.md) records facts, candidate,
+reproduction limits, safe recovery and the regression gate. Mac was left Ready;
+its ten original receive files were unchanged, with no Mac staging. Windows ACL
+restoration remains pending and the outside backup is retained.
+
+![Observed Mac TLS stall while the Windows GUI remained responsive](images/mac-m7/39-windows-receiver-tls-stall.jpg)
+
+![Sender timeout after the tester accepted the Windows ACL test](images/mac-m7/40-windows-acl-accept-timeout.jpg)
+
 ## Generated small-file reference hashes
 
 | File | Bytes | SHA-256 |

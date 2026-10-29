@@ -633,3 +633,30 @@ Documentation/lint/format and **83 tests passed, 1 Windows COM skip** for this
 scope update. Prior planning commit `f5eabff` CI run 40857391825 completed all six
 test/native-build jobs successfully. This new docs-only change is excluded from
 CI by the existing path filter; no three-host physical result is inferred.
+
+## M7 / 7A — Windows ACL receive hang found — 2026-10-29
+
+The actual Windows package was verified by owner-supplied manifest as clean
+`ec981af`, AMD64/Python 3.12.10/Qt 6.12.0. Owner applied add-file/add-directory
+denial only to a new test receive folder, saved an outside ACL backup and obtained
+an actual UnauthorizedAccess write probe. Subsequent native Mac requests stalled
+in TLS despite the correct established TCP destination and LanBridge listener.
+Windows UI remained responsive; logs had no new offer entry.
+
+Tester Quit/reopen restored discovery/TLS, but accepting `4a7fd4cc…` reproduced
+the fault: no Windows status update, empty hidden directory listing, Mac timeout
+at 0/37 B. This gate is **failed/open**, not a pass or a restart fix. Mac original
+receive inventory stayed unchanged and its final failure was archived to Ready.
+Images 39–40 are unedited Mac-side evidence, not Windows screenshots.
+
+Candidate: synchronous tempfile.mkdtemp Windows PermissionError retries when
+os.access says writable. A bounded no-mutation model observed four retries;
+native NTFS/stack confirmation remains needed. No application source was changed.
+At the owner's request, the [Windows-local handoff](WINDOWS_DEBUG_HANDOFF.zh-CN.md)
+defines native diagnosis/fix ownership, an isolated bounded reproduction,
+cross-platform regression and ACL recovery. The Windows test ACL is still denied
+at handoff; its backup must be retained until restoration is verified.
+
+Handoff checkpoint gate: documentation (17 Markdown files, 232 local links,
+41 images), lint/format and **83 passed, 1 Windows COM skip**. These checks do
+not resolve the physical ACL failure. This docs-only commit is excluded from CI.
