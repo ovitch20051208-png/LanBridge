@@ -7,8 +7,8 @@ import contextlib
 import hashlib
 import logging
 import os
+import secrets
 import shutil
-import tempfile
 import threading
 import time
 from collections.abc import Awaitable, Callable
@@ -100,6 +100,19 @@ def finalize(staged: Path, directory: Path, name: str) -> Path:
                     continue
             raise
     raise ProtocolError("Too many filename collisions")
+
+
+def _create_staging(directory: Path, device_id: str) -> Path:
+    # tempfile.mkdtemp retries PermissionError on Windows when os.access says
+    # writable, even if an NTFS ACL denies mkdir. That can block the event loop.
+    for _ in range(10):
+        stage = directory / f".lanbridge-{device_id[:16]}-{secrets.token_hex(16)}"
+        try:
+            stage.mkdir(mode=0o700)
+        except FileExistsError:
+            continue
+        return stage
+    raise FileExistsError("Too many staging directory name collisions")
 
 
 class TransferServer:
@@ -206,7 +219,7 @@ class TransferServer:
             directory.mkdir(parents=True, exist_ok=True)
             if shutil.disk_usage(directory).free < offer.total + 1024 * 1024:
                 raise ProtocolError("Insufficient free space")
-            stage = Path(tempfile.mkdtemp(prefix=f".lanbridge-{self.identity.id[:16]}-", dir=directory))
+            stage = _create_staging(directory, self.identity.id)
             if os.name != "nt":
                 stage.chmod(0o700)
             (stage / ".owner").write_text(self.identity.id, encoding="ascii")
